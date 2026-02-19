@@ -1,7 +1,7 @@
 #include "file.h"
 
-FILE *FileOpen(const char *filename, FILEMode mode)
-{   
+FILE *FileOpen(IN const char *filename, IN const FILEMode mode)
+{
     FILE *f = NULL;
     if (filename)
     {
@@ -18,7 +18,7 @@ FILE *FileOpen(const char *filename, FILEMode mode)
     return f;
 }
 
-void FileClose(FILE *f)
+void FileClose(IN FILE *f)
 {
     fclose(f);
 }

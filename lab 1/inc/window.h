@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "common.h"
 #include <cstdio>
 #include "rgba.h"
 #include "window_objects.h"
@@ -16,7 +17,7 @@ typedef struct WindowContext WindowContext;
 WindowContext *WindowContextCreate(const char *title, const size_t width, const size_t height);
 void WindowContextDestroy(WindowContext **windowContext);
 
-void WindowContextGetSizes(const WindowContext &windowContext, int &width, int &height);
+void WindowContextGetSizes(int &width, int &height, const WindowContext &windowContext);
 
 void WindowContextPresent(const WindowContext &windowContext);
 void WindowContextDelay(const int ms);

@@ -1,6 +1,7 @@
 #ifndef POINT_ARR_TRANSFORM_H
 #define POINT_ARR_TRANSFORM_H
 
+#include "common.h"
 #include "pointarr.h"
 #include "transforms.h"
 

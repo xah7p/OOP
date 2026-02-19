@@ -1,6 +1,7 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#include "common.h"
 #include "transforms.h"
 #include "window.h"
 

@@ -2,31 +2,29 @@
 #include "actions.h"
 #include "keyboard.h"
 
-static ErrorCode HandleKeyboardInput(const WindowContext &WindowContext);
+static ErrorCode HandleKeyboardInput(IN const WindowContext &WindowContext);
 
-ErrorCode RunEventLoop(const WindowContext &windowContext, const char *filename, const int loopDelay)
+ErrorCode RunEventLoop(IN const WindowContext &windowContext, IN const char *filename, IN const int loopDelay)
 {
-    ErrorCode code = SUCCESS;
     if (filename == NULL || loopDelay < 0)
-        code = INVALID_ARG;
-    else
+        return INVALID_ARG;
+
+    ErrorCode code = SUCCESS;
+    code = ActionModelLoad(filename, windowContext);
+    if (code == SUCCESS)
+        code = ActionModelDraw(windowContext);
+    
+    while (code == SUCCESS && WindowContextLoop() == LOOP_RUNNING)
     {
-        code = ActionModelLoad(filename, windowContext);
-        if (code == SUCCESS)
-            code = ActionModelDraw(windowContext);
-        
-        while (code == SUCCESS && WindowContextLoop() == LOOP_RUNNING)
-        {
-            if (WindowContextCheckKeyboard(windowContext))
-                HandleKeyboardInput(windowContext);
-            WindowContextDelay(loopDelay);
-        }
+        if (WindowContextCheckKeyboard(windowContext))
+            HandleKeyboardInput(windowContext);
+        WindowContextDelay(loopDelay);
     }
     ActionModelDestroy(windowContext);
     return code;
 }
 
-static ErrorCode HandleKeyboardInput(const WindowContext &windowContext)
+static ErrorCode HandleKeyboardInput(IN const WindowContext &windowContext)
 {
     ErrorCode code = SUCCESS;
     bool toRedraw = false;

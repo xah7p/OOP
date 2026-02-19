@@ -1,16 +1,15 @@
 #include "errors.h"
 #include "actions.h"
-#include "transforms.h"
 
-static TransformShift GetShiftCenter(const WindowContext &windowContext);
+static TransformShift GetShiftCenter(IN const WindowContext &windowContext);
 
-Action ActionCreate(const ActionType type, const WindowContext &windowContext)
+Action ActionCreate(IN const ActionType type, IN const WindowContext &windowContext)
 {
     Action action = {.windowContext = windowContext, .type = type};
     return action;
 }
 
-ErrorCode ActionModelLoad(const char *filename, const WindowContext &windowContext)
+ErrorCode ActionModelLoad(IN const char *filename, IN const WindowContext &windowContext)
 {
     Action actionLoad = ActionCreate(MODEL_LOAD, windowContext);
     actionLoad.centerShift = GetShiftCenter(windowContext);
@@ -19,46 +18,46 @@ ErrorCode ActionModelLoad(const char *filename, const WindowContext &windowConte
     return DomenHandleAction(actionLoad);
 }
 
-ErrorCode ActionModelDraw(const WindowContext &windowContext)
+ErrorCode ActionModelDraw(IN const WindowContext &windowContext)
 {
     Action actionDraw = ActionCreate(MODEL_DRAW, windowContext);
     return DomenHandleAction(actionDraw); 
 }
 
-void ActionModelDestroy(const WindowContext &windowContext)
+void ActionModelDestroy(IN const WindowContext &windowContext)
 {
     Action actionDestroy = ActionCreate(MODEL_DESTROY, windowContext);
     DomenHandleAction(actionDestroy);  
 }
 
-void ActionModelRotate(const TransformRotation &rotation, const WindowContext &windowContext)
+void ActionModelRotate(IN const TransformRotation &rotation, IN const WindowContext &windowContext)
 {
-    Action actionRotate = ActionCreate(MODEL_ROTATE, windowContext);
-    actionRotate.rotation = rotation;
+    Action actionRotate = ActionCreate(MODEL_UPDATE, windowContext);
+    TransoformsSetRotation(actionRotate.transforms, rotation);
 
     DomenHandleAction(actionRotate); 
 }
 
-void ActionModelShift(const TransformShift &shift, const WindowContext &windowContext)
+void ActionModelShift(IN const TransformShift &shift, IN const WindowContext &windowContext)
 {
-    Action actionShift = ActionCreate(MODEL_SHIFT, windowContext);
-    actionShift.shift = shift;
+    Action actionShift = ActionCreate(MODEL_UPDATE, windowContext);
+    TransoformsSetShift(actionShift.transforms, shift);
 
     DomenHandleAction(actionShift); 
 }
 
-void ActionModelScale(const TransformScale &scale, const WindowContext &windowContext)
+void ActionModelScale(IN const TransformScale &scale, IN const WindowContext &windowContext)
 {
-    Action actionScale = ActionCreate(MODEL_SCALE, windowContext);
-    actionScale.scale = scale;
+    Action actionScale = ActionCreate(MODEL_UPDATE, windowContext);
+    TransoformsSetScale(actionScale.transforms, scale);
 
     DomenHandleAction(actionScale); 
 }
 
-static TransformShift GetShiftCenter(const WindowContext &windowContext)
+static TransformShift GetShiftCenter(IN const WindowContext &windowContext)
 {
     int width = 0, height = 0;
-    WindowContextGetSizes(windowContext, width, height);
+    WindowContextGetSizes(width, height, windowContext);
     TransformShift shiftCenter = TransformShiftCreate();
     shiftCenter.x = (double)width / 2;
     shiftCenter.y = (double)height / 2;

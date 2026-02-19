@@ -2,8 +2,8 @@
 #include <cstdlib>
 #include <cstring>
 
-static ErrorCode PointArrAlloc(Point **inner, const size_t size);
-static Point PointArrSum(const Point *array, const size_t size);
+static ErrorCode PointArrAlloc(VAR Point **inner, IN const size_t size);
+static Point PointArrSum(IN const Point *array, IN const size_t size);
 
 PointArr PointArrCreate(void)
 {
@@ -13,44 +13,34 @@ PointArr PointArrCreate(void)
     return points;
 }
 
-void PointArrFree(PointArr &points)
+void PointArrFree(VAR PointArr &points)
 {
     free(points.inner);
     points.inner = NULL;
     points.size = 0;
 }
 
-ErrorCode PointArrRead(PointArr &points, FILE *f)
+ErrorCode PointArrRead(OUT PointArr &points, IN FILE *f)
 {
-    ErrorCode code = SUCCESS;
     if (f == NULL)
-        code = INVALID_ARG;
+        return INVALID_ARG;
+
+    ErrorCode code = SUCCESS;
+    if (fscanf(f, "%zu", &points.size) != 1)
+        code = INVALID_INPUT;
     else
     {
-        int tmp;
-        if (fscanf(f, "%d", &tmp) != 1 || tmp <= 0)
-            code = INVALID_INPUT;
-        else
-        {
-            size_t tmpSize = (size_t) tmp;
-            Point *tmpInner = NULL;
-            code = PointArrAlloc(&tmpInner, tmpSize);
-            for (size_t i = 0; code == SUCCESS && i < tmpSize; i++)
-                code = PointRead(tmpInner[i], f);
-            
-            if (code != SUCCESS)
-                free(tmpInner);
-            else
-            {
-                points.inner = tmpInner;
-                points.size = tmpSize;
-            }
-        }
+        code = PointArrAlloc(&points.inner, points.size);
+        for (size_t i = 0; code == SUCCESS && i < points.size; i++)
+            code = PointRead(points.inner[i], f);
+        
+        if (code != SUCCESS)
+            free(points.inner);
     }
     return code;
 }
 
-ErrorCode PointArrCopy(PointArr &dst, const PointArr &src)
+ErrorCode PointArrCopy(OUT PointArr &dst, IN const PointArr &src)
 {
     ErrorCode code = SUCCESS;
     code = PointArrAlloc(&dst.inner, src.size);
@@ -62,17 +52,15 @@ ErrorCode PointArrCopy(PointArr &dst, const PointArr &src)
     return code;
 }
 
-ErrorCode PointArrCenter(Point &center, const PointArr &points)
+ErrorCode PointArrCenter(OUT Point &center, IN const PointArr &points)
 {
     ErrorCode code = SUCCESS;
-    Point tmp = PointArrSum(points.inner, points.size);
-    code = PointDiv(tmp, points.size);
-    if (code == SUCCESS)
-        center = tmp;
+    center = PointArrSum(points.inner, points.size);
+    code = PointDiv(center, points.size);
     return code;
 }
 
-static Point PointArrSum(const Point *array, const size_t size)
+static Point PointArrSum(IN const Point *array, IN const size_t size)
 {
     Point pointSum = PointCreate(0, 0, 0);
     for (size_t i = 0; i < size; i++)
@@ -80,7 +68,7 @@ static Point PointArrSum(const Point *array, const size_t size)
     return pointSum;
 }
 
-static ErrorCode PointArrAlloc(Point **inner, const size_t size)
+static ErrorCode PointArrAlloc(VAR Point **inner, IN const size_t size)
 {
     ErrorCode code = SUCCESS;
     if (size == 0)

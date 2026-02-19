@@ -19,7 +19,7 @@
 #define TRANSFORM_SHIFT_RATE 5
 #define TRANSFORM_SCALE_RATE 1.01
 
-bool CheckKeysForRotate(TransformRotation &rotation, const WindowContext &windowContext)
+bool CheckKeysForRotate(VAR TransformRotation &rotation, IN const WindowContext &windowContext)
 {
     bool isAnyPressed = true;
     if (WindowContextCheckKeyPressed(windowContext, ROTATE_XLOW))
@@ -39,7 +39,7 @@ bool CheckKeysForRotate(TransformRotation &rotation, const WindowContext &window
     return isAnyPressed;
 }
 
-bool CheckKeysForShift(TransformShift &shift, const WindowContext &windowContext)
+bool CheckKeysForShift(VAR TransformShift &shift, IN const WindowContext &windowContext)
 {
     bool isAnyPressed = true;
     if (WindowContextCheckKeyPressed(windowContext, SHIFT_XLOW))
@@ -55,7 +55,7 @@ bool CheckKeysForShift(TransformShift &shift, const WindowContext &windowContext
     return isAnyPressed;
 }
 
-bool CheckKeysForScale(TransformScale &scale, const WindowContext &windowContext)
+bool CheckKeysForScale(VAR TransformScale &scale, IN const WindowContext &windowContext)
 {
     bool isAnyPressed = true;
     if (WindowContextCheckKeyPressed(windowContext, SCALE_LOW))

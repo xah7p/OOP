@@ -8,12 +8,11 @@ AppArgs AppArgsCreate(void)
     return args;
 }
 
-ErrorCode AppArgsParse(AppArgs &args, int argc, char **argv)
+ErrorCode AppArgsParse(VAR AppArgs &args, IN const int argc, IN char **argv)
 {
-    ErrorCode code = SUCCESS;
     if (argc != 2)
-        code = INVALID_ARG;
-    else
-        strcpy(args.filename, argv[1]);
-    return code;
+        return INVALID_ARG;
+        
+    strcpy(args.filename, argv[1]);
+    return SUCCESS;
 }

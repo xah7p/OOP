@@ -1,6 +1,8 @@
 #ifndef WINDOW_OBJECTS_H
 #define WINDOW_OBJECTS_H
 
+#include "common.h"
+
 typedef struct 
 {
     double x;

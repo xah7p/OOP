@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 
-static ErrorCode LineArrAlloc(Line **inner, const size_t size);
+static ErrorCode LineArrAlloc(VAR Line **inner, IN const size_t size);
 
 LineArr LineArrCreate(void)
 {
@@ -12,42 +12,34 @@ LineArr LineArrCreate(void)
     return lines;
 }
 
-void LineArrFree(LineArr &lines)
+void LineArrFree(VAR LineArr &lines)
 {
     free(lines.inner);
     lines.inner = NULL;
     lines.size = 0;
 }
 
-ErrorCode LineArrRead(LineArr &lines, FILE *f)
+ErrorCode LineArrRead(OUT LineArr &lines, IN FILE *f)
 {
-    ErrorCode code = SUCCESS;
     if (f == NULL)
         return INVALID_ARG;
 
-    int tmp;
-    if (fscanf(f, "%d", &tmp) != 1 || tmp <= 0)
+    ErrorCode code = SUCCESS;
+    if (fscanf(f, "%zu", &lines.size) != 1)
         code = INVALID_INPUT;
     else
     {
-        size_t tmpSize = (size_t) tmp;
-        Line *tmpInner = NULL;
-        code = LineArrAlloc(&tmpInner, tmpSize);
-        for (size_t i = 0; code == SUCCESS && i < tmpSize; i++)
-            code = LineRead(tmpInner[i], f);
+        code = LineArrAlloc(&lines.inner, lines.size);
+        for (size_t i = 0; code == SUCCESS && i < lines.size; i++)
+            code = LineRead(lines.inner[i], f);
         
         if (code != SUCCESS)
-            free(tmpInner);
-        else
-        {
-            lines.inner = tmpInner;
-            lines.size = tmpSize;
-        }
+            free(lines.inner);
     }
     return code;
 }
 
-ErrorCode LineArrCopy(LineArr &dst, const LineArr &src)
+ErrorCode LineArrCopy(OUT LineArr &dst, IN const LineArr &src)
 {
     ErrorCode code = SUCCESS;
     code = LineArrAlloc(&dst.inner, src.size);
@@ -59,18 +51,16 @@ ErrorCode LineArrCopy(LineArr &dst, const LineArr &src)
     return code;
 }
 
-static ErrorCode LineArrAlloc(Line **inner, const size_t size)
+static ErrorCode LineArrAlloc(VAR Line **inner, IN const size_t size)
 {
-    ErrorCode rc = SUCCESS;
     if (size == 0)
-        rc = INVALID_ARG;
+        return INVALID_ARG;
+    
+    ErrorCode rc = SUCCESS;
+    Line *tmp = (Line *) calloc(sizeof(Line), size);
+    if (tmp == NULL)
+        rc = MEMORY;
     else
-    {
-        Line *tmp = (Line *) calloc(sizeof(Line), size);
-        if (tmp == NULL)
-            rc = MEMORY;
-        else
-            *inner = tmp;
-    }
+        *inner = tmp;
     return rc;
 }

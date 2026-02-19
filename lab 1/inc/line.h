@@ -1,8 +1,9 @@
 #ifndef LINE_H
 #define LINE_H
 
-#include <stdio.h>
+#include "common.h"
 #include "errors.h"
+#include <stdio.h>
 
 typedef struct
 {

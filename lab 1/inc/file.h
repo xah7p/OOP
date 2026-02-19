@@ -1,6 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include "common.h"
 #include <stdio.h>
 
 typedef enum

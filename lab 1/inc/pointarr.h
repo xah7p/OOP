@@ -1,6 +1,7 @@
 #ifndef POINT_ARR_H
 #define POINT_ARR_H
 
+#include "common.h"
 #include "point.h"
 
 typedef struct

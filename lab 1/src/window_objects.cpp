@@ -1,6 +1,6 @@
 #include "window_objects.h"
 
-WindowContextPoint WindowContextPointCreate(const double x, const double y)
+WindowContextPoint WindowContextPointCreate(IN const double x, IN const double y)
 {
     WindowContextPoint point;
     point.x = x;
@@ -8,7 +8,7 @@ WindowContextPoint WindowContextPointCreate(const double x, const double y)
     return point;
 }
 
-WindowContextLine WindowContextLineCreate(const WindowContextPoint start, const WindowContextPoint end)
+WindowContextLine WindowContextLineCreate(IN const WindowContextPoint start, IN const WindowContextPoint end)
 {
     WindowContextLine line;
     line.start = start;

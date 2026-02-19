@@ -1,11 +1,12 @@
 #include "draw.h"
 #include "window_objects.h"
 
-static WindowContextPoint WindowContextPointFromPoint(const Point &point);
-static WindowContextLine WindowContextLineFromLine(const Line &Line, const Point *points);
-static void LineArrDraw(const LineArr &lines, const PointArr &points, const WindowContext &windowContext);
+static void ModelObjectsDraw(IN const Model &newModel, IN const WindowContext &windowContext);
+static WindowContextPoint WindowContextPointFromPoint(IN const Point &point);
+static WindowContextLine WindowContextLineFromLine(IN const Line &Line, IN const Point *points);
+static void LineArrDraw(IN const LineArr &lines, IN const PointArr &points, IN const WindowContext &windowContext);
 
-ErrorCode ModelDraw(const Model &model, const TransformModelData &transformModelData, const WindowContext &windowContext)
+ErrorCode ModelDraw(IN const Model &model, IN const TransformModelData &transformModelData, IN const WindowContext &windowContext)
 {
     ErrorCode code = SUCCESS;
     
@@ -15,19 +16,24 @@ ErrorCode ModelDraw(const Model &model, const TransformModelData &transformModel
     {
         ModelTransform(newModel, transformModelData);
         WindowContextClear(windowContext);
-        LineArrDraw(newModel.lines, newModel.points, windowContext);
+        ModelObjectsDraw(newModel, windowContext);
         WindowContextPresent(windowContext);
         ModelFree(newModel);
     }
     return code;
 }
 
-static WindowContextPoint WindowContextPointFromPoint(const Point &point)
+static void ModelObjectsDraw(IN const Model &newModel, IN const WindowContext &windowContext)
+{
+    LineArrDraw(newModel.lines, newModel.points, windowContext);
+}
+
+static WindowContextPoint WindowContextPointFromPoint(IN const Point &point)
 {
     return WindowContextPointCreate(point.x, point.y);
 }
 
-static WindowContextLine WindowContextLineFromLine(const Line &line, const Point *points)
+static WindowContextLine WindowContextLineFromLine(IN const Line &line, IN const Point *points)
 {
     WindowContextPoint start = WindowContextPointFromPoint(points[line.startIndex]);
     WindowContextPoint end = WindowContextPointFromPoint(points[line.endIndex]);
@@ -35,7 +41,7 @@ static WindowContextLine WindowContextLineFromLine(const Line &line, const Point
     return WindowContextLineCreate(start, end);
 }
 
-static void LineArrDraw(const LineArr &lines, const PointArr &points, const WindowContext &windowContext)
+static void LineArrDraw(IN const LineArr &lines, IN const PointArr &points, IN const WindowContext &windowContext)
 {
     for (size_t i = 0; i < lines.size; i++)
     {

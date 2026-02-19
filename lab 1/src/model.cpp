@@ -2,9 +2,11 @@
 #include "file.h"
 #include "point_arr_transform.h"
 
-static ErrorCode ModelRead(Model &model, FILE *f);
-static bool CheckLinesValid(const PointArr &points, const LineArr &lines);
-static bool CheckLineValid(const Line &line, const size_t pointsCount);
+static ErrorCode ModelRead(VAR Model &model, IN FILE *f);
+static ErrorCode ModelReadData(OUT Model &model, IN FILE *f);
+static bool ModelCheckLinesValid(IN const Model &model);
+static bool CheckLinesValid(IN const PointArr &points, IN const LineArr &lines);
+static bool CheckLineValid(IN const Line &line, IN const size_t pointsCount);
 
 Model ModelCreate(void)
 {
@@ -12,57 +14,32 @@ Model ModelCreate(void)
     return model;
 }
 
-void ModelFree(Model &model)
+void ModelFree(VAR Model &model)
 {
     PointArrFree(model.points);
     LineArrFree(model.lines);
 }
 
-ErrorCode ModelLoad(Model &model, const char *filename)
+ErrorCode ModelLoad(VAR Model &model, IN const char *filename)
 {
-    ErrorCode code = SUCCESS;
     if (!filename)
-        code = INVALID_ARG;
-    else
-    {
-        FILE *f = FileOpen(filename, READ);
-        if (f == NULL)
-            code = FILE_NOT_OPENED;
-        else
-        {
-            code = ModelRead(model, f);
-            FileClose(f);
-        }
-    }
-    return code;
-}
-
-static ErrorCode ModelRead(Model &model, FILE *f)
-{
-    ErrorCode code = SUCCESS;
-
-    if (f == NULL)
         return INVALID_ARG;
-
-    code = PointArrRead(model.points, f);
-    if (code != SUCCESS)
-        PointArrFree(model.points);
+    
+    ErrorCode code = SUCCESS;
+    FILE *f = FileOpen(filename, READ);
+    if (f == NULL)
+        code = FILE_NOT_OPENED;
     else
     {
-        code = LineArrRead(model.lines, f);
-        if (code != SUCCESS || !CheckLinesValid(model.points, model.lines))
-        {
-            PointArrFree(model.points);
-            LineArrFree(model.lines);
-        }
+        code = ModelRead(model, f);
+        FileClose(f);
     }
     return code;
 }
 
-ErrorCode ModelCopy(Model &dst, const Model &src)
+ErrorCode ModelCopy(OUT Model &dst, IN const Model &src)
 {
     ErrorCode code = SUCCESS;
-
     code = PointArrCopy(dst.points, src.points);
 
     if (code == SUCCESS)
@@ -71,7 +48,7 @@ ErrorCode ModelCopy(Model &dst, const Model &src)
     return code;
 }
 
-void ModelTransform(Model &model, const TransformModelData &transformModelData)
+void ModelTransform(OUT Model &model, IN const TransformModelData &transformModelData)
 {
     PointArrRotateAroundCenter(model.points, transformModelData.rotation);
     PointArrScale(model.points, transformModelData.scale);
@@ -79,7 +56,43 @@ void ModelTransform(Model &model, const TransformModelData &transformModelData)
     PointArrShift(model.points, transformModelData.centerShift);
 }
 
-static bool CheckLinesValid(const PointArr &points, const LineArr &lines)
+static ErrorCode ModelRead(VAR Model &model, IN FILE *f)
+{
+    if (f == NULL)
+        return INVALID_ARG;
+    
+    ErrorCode code = SUCCESS;
+    Model newModel = ModelCreate();
+    code = ModelReadData(newModel, f);
+    if (code == SUCCESS && ModelCheckLinesValid(newModel))
+        model = newModel;
+    else
+    {
+        ModelFree(newModel);
+        code = INVALID_INPUT;
+    }
+    return code;
+}
+
+static ErrorCode ModelReadData(OUT Model &model, IN FILE *f)
+{
+    if (f == NULL)
+        return INVALID_ARG;
+    
+    ErrorCode code = SUCCESS;
+    code = PointArrRead(model.points, f);
+    if (code == SUCCESS)
+        code = LineArrRead(model.lines, f);
+    
+    return code;
+}
+
+static bool ModelCheckLinesValid(IN const Model &model)
+{
+    return CheckLinesValid(model.points, model.lines);
+}
+
+static bool CheckLinesValid(IN const PointArr &points, IN const LineArr &lines)
 {
     bool isLinesValid = true;
     for (size_t i = 0; i < lines.size && isLinesValid; i++)
@@ -88,7 +101,7 @@ static bool CheckLinesValid(const PointArr &points, const LineArr &lines)
     return isLinesValid;
 }
 
-static bool CheckLineValid(const Line &line, const size_t pointsCount)
+static bool CheckLineValid(IN const Line &line, IN const size_t pointsCount)
 {
     return line.startIndex < pointsCount && line.endIndex < pointsCount;
 }

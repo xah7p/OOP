@@ -11,7 +11,7 @@ struct WindowContext
     const Uint8 *keyboardState;
 };
 
-WindowContext *WindowContextCreate(const char *title, const size_t width, const size_t height)
+WindowContext *WindowContextCreate(IN const char *title, IN const size_t width, IN const size_t height)
 {
     if (!title)
         return NULL;
@@ -44,18 +44,18 @@ WindowContext *WindowContextCreate(const char *title, const size_t width, const 
     return windowContext;
 }
 
-void WindowContextSetPenColor(WindowContext &windowContext, const RGBA color)
+void WindowContextSetPenColor(VAR WindowContext &windowContext, IN const RGBA color)
 {
     windowContext.penColor = color;
     SDL_SetRenderDrawColor(windowContext.renderer, color.r, color.g, color.b, color.a);
 }
 
-void WindowContextSetBackgroundColor(WindowContext &windowContext, const RGBA color)
+void WindowContextSetBackgroundColor(VAR WindowContext &windowContext, IN const RGBA color)
 {
     windowContext.backgroundColor = color;
 }
 
-void WindowContextDestroy(WindowContext **windowContext)
+void WindowContextDestroy(VAR WindowContext **windowContext)
 {
     if (windowContext && *windowContext)
     {
@@ -67,17 +67,17 @@ void WindowContextDestroy(WindowContext **windowContext)
     }
 }
 
-void WindowContextPresent(const WindowContext &windowContext)
+void WindowContextPresent(IN const WindowContext &windowContext)
 {
     SDL_RenderPresent(windowContext.renderer);
 }
 
-void WindowContextDelay(const int ms)
+void WindowContextDelay(IN const int ms)
 {
     SDL_Delay(ms);
 }
 
-void WindowContextClear(const WindowContext &windowContext)
+void WindowContextClear(IN const WindowContext &windowContext)
 {
     const RGBA backgroundColor = windowContext.backgroundColor;
     const RGBA penColor = windowContext.penColor;
@@ -98,7 +98,7 @@ LoopState WindowContextLoop(void)
     return loopState;
 }
 
-bool WindowContextCheckKeyboard(const WindowContext &windowContext)
+bool WindowContextCheckKeyboard(IN const WindowContext &windowContext)
 {
     bool isSomethingPressed = false;
     for (size_t i = 0; i < SDL_NUM_SCANCODES && isSomethingPressed == false; i++)
@@ -107,18 +107,18 @@ bool WindowContextCheckKeyboard(const WindowContext &windowContext)
     return isSomethingPressed;
 }
 
-bool WindowContextCheckKeyPressed(const WindowContext &windowContext, const char key)
+bool WindowContextCheckKeyPressed(IN const WindowContext &windowContext, IN const char key)
 {
     SDL_Scancode scancode = SDL_GetScancodeFromKey(tolower(key));
     return windowContext.keyboardState[scancode];
 }
 
-void WindowContextDrawLine(const WindowContext &windowContext, const WindowContextPoint &p1, const WindowContextPoint &p2)
+void WindowContextDrawLine(IN const WindowContext &windowContext, IN const WindowContextPoint &p1, IN const WindowContextPoint &p2)
 {
     SDL_RenderDrawLine(windowContext.renderer, p1.x, p1.y, p2.x, p2.y);
 }
 
-void WindowContextGetSizes(const WindowContext &windowContext, int &width, int &height)
+void WindowContextGetSizes(VAR int &width, VAR int &height, IN const WindowContext &windowContext)
 {
     SDL_GetWindowSize(windowContext.window, &width, &height);
 }

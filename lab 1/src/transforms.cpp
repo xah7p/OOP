@@ -1,6 +1,10 @@
 #include "transforms.h"
 
-TransformShift TransformShiftInit(const double x, const double y, const double z)
+static void TransformModelDataAddShift(VAR TransformShift &shift, IN const TransformShift &new_shift);
+static void TransformModelDataAddScale(VAR TransformScale &scale, IN const TransformScale &new_scale);
+static void TransformModelDataAddRotation(VAR TransformRotation &rotation, IN const TransformRotation &new_rotation);
+
+TransformShift TransformShiftInit(IN const double x, IN const double y, IN const double z)
 {
     TransformShift shift = {x, y, z};
     return shift;
@@ -31,24 +35,59 @@ TransformModelData TransformModelDataCreate(void)
     return transformModelData;
 }
 
-void TransformModelDataSetCenterShift(TransformModelData &transformModelData, const TransformShift &centerShift)
+void TransformModelDataSetCenterShift(VAR TransformModelData &transformModelData, IN const TransformShift &centerShift)
 {
     transformModelData.centerShift = centerShift;
 }
 
-void TransformModelDataAddShift(TransformShift &shift, const TransformShift &new_shift)
+ErrorCode TransformModelDataUpdate(VAR TransformModelData &transformModelData, IN const Transforms &transforms)
+{
+    switch (transforms.type)
+    {
+    case ROTATE:
+        TransformModelDataAddRotation(transformModelData.rotation, transforms.rotation);
+        break;
+    case SHIFT:
+        TransformModelDataAddShift(transformModelData.shift, transforms.shift);
+        break;
+    case SCALE:
+        TransformModelDataAddScale(transformModelData.scale, transforms.scale);
+        break;
+    }
+    return SUCCESS;
+}
+
+void TransoformsSetRotation(VAR Transforms &transforms, IN const TransformRotation &rotation)
+{
+    transforms.type = ROTATE;
+    transforms.rotation = rotation;
+}
+
+void TransoformsSetShift(VAR Transforms &transforms, IN const TransformShift &shift)
+{
+    transforms.type = SHIFT;
+    transforms.shift = shift;
+}
+
+void TransoformsSetScale(VAR Transforms &transforms, IN const TransformScale &scale)
+{
+    transforms.type = SCALE;
+    transforms.scale = scale;
+}
+
+static void TransformModelDataAddShift(VAR TransformShift &shift, IN const TransformShift &new_shift)
 {
     shift.x += new_shift.x;
     shift.y += new_shift.y;
     shift.z += new_shift.z;
 }
 
-void TransformModelDataAddScale(TransformScale &scale, const TransformScale &new_scale)
+static void TransformModelDataAddScale(VAR TransformScale &scale, IN const TransformScale &new_scale)
 {
     scale.factor *= new_scale.factor;
 }
 
-void TransformModelDataAddRotation(TransformRotation &rotation, const TransformRotation &new_rotation)
+static void TransformModelDataAddRotation(VAR TransformRotation &rotation, IN const TransformRotation &new_rotation)
 {
     rotation.x += new_rotation.x;
     rotation.y += new_rotation.y;

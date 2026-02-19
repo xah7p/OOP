@@ -1,6 +1,7 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include "common.h"
 #include "errors.h"
 #include "transforms.h"
 #include <cstdio>

@@ -2,32 +2,32 @@
 #include "transforms.h"
 #include <cmath>
 
-static void PointRotateX(Point &point, const double &angle);
-static void PointRotateY(Point &point, const double &angle);
-static void PointRotateZ(Point &point, const double &angle);
+static void PointRotateX(VAR Point &point, IN const double &angle);
+static void PointRotateY(VAR Point &point, IN const double &angle);
+static void PointRotateZ(VAR Point &point, IN const double &angle);
 
-void PointScale(Point &point, const TransformScale &scale)
+void PointScale(VAR Point &point, IN const TransformScale &scale)
 {
     point.x *= scale.factor;
     point.y *= scale.factor;
     point.z *= scale.factor;
 }
 
-void PointShift(Point &point, const TransformShift &shift)
+void PointShift(VAR Point &point, IN const TransformShift &shift)
 {
     point.x += shift.x;
     point.y += shift.y;
     point.z += shift.z;
 }
 
-void PointRotate(Point &point, const TransformRotation &rotation)
+void PointRotate(VAR Point &point, IN const TransformRotation &rotation)
 {
     PointRotateX(point, rotation.x);
     PointRotateY(point, rotation.y);
     PointRotateZ(point, rotation.z);
 }
 
-static void PointRotateX(Point &point, const double &angle)
+static void PointRotateX(VAR Point &point, IN const double &angle)
 {
     double sinAngle = sin(angle);
     double cosAngle = cos(angle);
@@ -39,7 +39,7 @@ static void PointRotateX(Point &point, const double &angle)
     point.z = z;
 }
 
-static void PointRotateY(Point &point, const double &angle)
+static void PointRotateY(VAR Point &point, IN const double &angle)
 {
     double sinAngle = sin(angle);
     double cosAngle = cos(angle);
@@ -51,7 +51,7 @@ static void PointRotateY(Point &point, const double &angle)
     point.z = z;
 }
 
-static void PointRotateZ(Point &point, const double &angle)
+static void PointRotateZ(VAR Point &point, IN const double &angle)
 {
     double sinAngle = sin(angle);
     double cosAngle = cos(angle);

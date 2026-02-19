@@ -1,6 +1,7 @@
 #ifndef LINE_ARR_H
 #define LINE_ARR_H
 
+#include "common.h"
 #include "line.h"
 
 typedef struct

@@ -2,7 +2,7 @@
 #include "draw.h"
 #include "transforms.h"
 
-ErrorCode DomenHandleAction(Action &action)
+ErrorCode DomenHandleAction(IN const Action &action)
 {
     ErrorCode code = SUCCESS;
 
@@ -18,17 +18,11 @@ ErrorCode DomenHandleAction(Action &action)
     case MODEL_DRAW:
         code = ModelDraw(model, transformModelData, action.windowContext);
         break;
+    case MODEL_UPDATE:
+        code = TransformModelDataUpdate(transformModelData, action.transforms);
+        break;
     case MODEL_DESTROY:
         ModelFree(model);
-        break;
-    case MODEL_ROTATE:
-        TransformModelDataAddRotation(transformModelData.rotation, action.rotation);
-        break;
-    case MODEL_SHIFT:
-        TransformModelDataAddShift(transformModelData.shift, action.shift);
-        break;
-    case MODEL_SCALE:
-        TransformModelDataAddScale(transformModelData.scale, action.scale);
         break;
     }
     return code;

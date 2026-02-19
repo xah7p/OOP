@@ -1,9 +1,11 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
+#include "common.h"
 #include "errors.h"
 #include "window.h"
 #include "action_handler.h"
+#include "transforms.h"
 
 Action ActionCreate(const ActionType type, const WindowContext &windowContext);
 ErrorCode ActionModelLoad(const char *filename, const WindowContext &windowContext);
