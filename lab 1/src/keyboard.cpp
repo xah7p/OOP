@@ -15,9 +15,9 @@
 #define SHIFT_YLOW  'g'
 #define SHIFT_YUP   'b'
 
-#define TRANSFORM_ROTATION_RATE 0.05
-#define TRANSFORM_SHIFT_RATE 5
-#define TRANSFORM_SCALE_RATE 1.01
+#define TRANSFORM_ROTATION_RATE 0.01
+#define TRANSFORM_SHIFT_RATE 1
+#define TRANSFORM_SCALE_RATE 1.001
 
 bool CheckKeysForRotate(VAR TransformRotation &rotation, IN const WindowContext &windowContext)
 {

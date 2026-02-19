@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 
+static ErrorCode LineArrReadSize(VAR size_t &lineArrSize, IN FILE *f);
 static ErrorCode LineArrAlloc(VAR Line **inner, IN const size_t size);
 
 LineArr LineArrCreate(void)
@@ -25,9 +26,8 @@ ErrorCode LineArrRead(OUT LineArr &lines, IN FILE *f)
         return INVALID_ARG;
 
     ErrorCode code = SUCCESS;
-    if (fscanf(f, "%zu", &lines.size) != 1)
-        code = INVALID_INPUT;
-    else
+    code = LineArrReadSize(lines.size, f);
+    if (code == SUCCESS)
     {
         code = LineArrAlloc(&lines.inner, lines.size);
         for (size_t i = 0; code == SUCCESS && i < lines.size; i++)
@@ -56,11 +56,19 @@ static ErrorCode LineArrAlloc(VAR Line **inner, IN const size_t size)
     if (size == 0)
         return INVALID_ARG;
     
-    ErrorCode rc = SUCCESS;
+    ErrorCode code = SUCCESS;
     Line *tmp = (Line *) calloc(sizeof(Line), size);
     if (tmp == NULL)
-        rc = MEMORY;
+        code = LINE_ARR_NOT_ALLOCATED;
     else
         *inner = tmp;
-    return rc;
+    return code;
+}
+
+static ErrorCode LineArrReadSize(VAR size_t &lineArrSize, IN FILE *f)
+{
+    ErrorCode code = SUCCESS;
+    if (fscanf(f, "%zu", &lineArrSize) != 1)
+        code = INVALID_LINE_ARR_SIZE;
+    return code;
 }

@@ -15,6 +15,7 @@ Model ModelCreate(void);
 void ModelFree(Model &model);
 ErrorCode ModelLoad(Model &model, const char *filename);
 ErrorCode ModelCopy(Model &dst, const Model &src);
+ErrorCode ModelMove(Model &newModel, const Model &model);
 void ModelTransform(Model &model, const TransformModelData &transformModelData);
 
 #endif

@@ -17,7 +17,7 @@ ErrorCode PointRead(VAR Point &point, IN FILE *f)
     ErrorCode rc = SUCCESS;
     Point pointTemp;
     if (fscanf(f, "%lf%lf%lf", &pointTemp.x, &pointTemp.y, &pointTemp.z) != 3)
-        rc = INVALID_INPUT;
+        rc = INVALID_POINT_INPUT;
     else
         point = pointTemp;
     return rc;

@@ -12,15 +12,17 @@ ErrorCode RunEventLoop(IN const WindowContext &windowContext, IN const char *fil
     ErrorCode code = SUCCESS;
     code = ActionModelLoad(filename, windowContext);
     if (code == SUCCESS)
-        code = ActionModelDraw(windowContext);
-    
-    while (code == SUCCESS && WindowContextLoop() == LOOP_RUNNING)
     {
-        if (WindowContextCheckKeyboard(windowContext))
-            HandleKeyboardInput(windowContext);
-        WindowContextDelay(loopDelay);
+        code = ActionModelDraw(windowContext);
+        if (code == SUCCESS)
+        {
+            while (WindowContextLoop() == LOOP_RUNNING)
+                if (WindowContextCheckKeyboard(windowContext))
+                    HandleKeyboardInput(windowContext);
+            WindowContextDelay(loopDelay);
+        }
+        ActionModelDestroy(windowContext);
     }
-    ActionModelDestroy(windowContext);
     return code;
 }
 

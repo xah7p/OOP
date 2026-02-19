@@ -4,7 +4,7 @@
 
 static ErrorCode ModelRead(VAR Model &model, IN FILE *f);
 static ErrorCode ModelReadData(OUT Model &model, IN FILE *f);
-static bool ModelCheckLinesValid(IN const Model &model);
+static ErrorCode ModelCheckLinesValid(IN const Model &model);
 static bool CheckLinesValid(IN const PointArr &points, IN const LineArr &lines);
 static bool CheckLineValid(IN const Line &line, IN const size_t pointsCount);
 
@@ -37,6 +37,12 @@ ErrorCode ModelLoad(VAR Model &model, IN const char *filename)
     return code;
 }
 
+ErrorCode ModelMove(VAR Model &newModel, IN const Model &model)
+{
+    newModel = model;
+    return SUCCESS;
+}
+
 ErrorCode ModelCopy(OUT Model &dst, IN const Model &src)
 {
     ErrorCode code = SUCCESS;
@@ -64,12 +70,16 @@ static ErrorCode ModelRead(VAR Model &model, IN FILE *f)
     ErrorCode code = SUCCESS;
     Model newModel = ModelCreate();
     code = ModelReadData(newModel, f);
-    if (code == SUCCESS && ModelCheckLinesValid(newModel))
-        model = newModel;
-    else
+    if (code == SUCCESS)
     {
-        ModelFree(newModel);
-        code = INVALID_INPUT;
+        code = ModelCheckLinesValid(newModel);
+        if (code != SUCCESS)
+            ModelFree(newModel);
+        else
+        {
+            ModelFree(model);
+            ModelMove(newModel, model);
+        }
     }
     return code;
 }
@@ -82,14 +92,20 @@ static ErrorCode ModelReadData(OUT Model &model, IN FILE *f)
     ErrorCode code = SUCCESS;
     code = PointArrRead(model.points, f);
     if (code == SUCCESS)
+    {
         code = LineArrRead(model.lines, f);
-    
+        if (code != SUCCESS)
+            PointArrFree(model.points);
+    }
     return code;
 }
 
-static bool ModelCheckLinesValid(IN const Model &model)
+static ErrorCode ModelCheckLinesValid(IN const Model &model)
 {
-    return CheckLinesValid(model.points, model.lines);
+    ErrorCode code = SUCCESS;
+    if (!CheckLinesValid(model.points, model.lines))
+        code = INVALID_LINES_INDEXES;
+    return code;
 }
 
 static bool CheckLinesValid(IN const PointArr &points, IN const LineArr &lines)

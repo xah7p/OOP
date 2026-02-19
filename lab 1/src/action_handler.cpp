@@ -24,6 +24,9 @@ ErrorCode DomenHandleAction(IN const Action &action)
     case MODEL_DESTROY:
         ModelFree(model);
         break;
+    default:
+        code = UNKNOWN_ACTION;
+        break;
     }
     return code;
 }

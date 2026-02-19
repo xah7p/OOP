@@ -42,6 +42,7 @@ void TransformModelDataSetCenterShift(VAR TransformModelData &transformModelData
 
 ErrorCode TransformModelDataUpdate(VAR TransformModelData &transformModelData, IN const Transforms &transforms)
 {
+    ErrorCode code = SUCCESS;
     switch (transforms.type)
     {
     case ROTATE:
@@ -53,8 +54,11 @@ ErrorCode TransformModelDataUpdate(VAR TransformModelData &transformModelData, I
     case SCALE:
         TransformModelDataAddScale(transformModelData.scale, transforms.scale);
         break;
+    default:
+        code = UNKNOWN_TRANSFORM;
+        break;
     }
-    return SUCCESS;
+    return code;
 }
 
 void TransoformsSetRotation(VAR Transforms &transforms, IN const TransformRotation &rotation)

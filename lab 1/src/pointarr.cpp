@@ -4,6 +4,7 @@
 
 static ErrorCode PointArrAlloc(VAR Point **inner, IN const size_t size);
 static Point PointArrSum(IN const Point *array, IN const size_t size);
+static ErrorCode PointArrReadSize(VAR size_t &pointArrSize, IN FILE *f);
 
 PointArr PointArrCreate(void)
 {
@@ -26,9 +27,8 @@ ErrorCode PointArrRead(OUT PointArr &points, IN FILE *f)
         return INVALID_ARG;
 
     ErrorCode code = SUCCESS;
-    if (fscanf(f, "%zu", &points.size) != 1)
-        code = INVALID_INPUT;
-    else
+    code = PointArrReadSize(points.size, f);
+    if (code == SUCCESS)
     {
         code = PointArrAlloc(&points.inner, points.size);
         for (size_t i = 0; code == SUCCESS && i < points.size; i++)
@@ -72,14 +72,20 @@ static ErrorCode PointArrAlloc(VAR Point **inner, IN const size_t size)
 {
     ErrorCode code = SUCCESS;
     if (size == 0)
-        code = INVALID_ARG;
+        return INVALID_ARG;
+    
+    Point *tmp = (Point *) calloc(sizeof(Point), size);
+    if (tmp == NULL)
+        code = POINT_ARR_NOT_ALLOCATED;
     else
-    {
-        Point *tmp = (Point *) calloc(sizeof(Point), size);
-        if (tmp == NULL)
-            code = MEMORY;
-        else
-            *inner = tmp;
-    }
+        *inner = tmp;
+    return code;
+}
+
+static ErrorCode PointArrReadSize(VAR size_t &pointArrSize, IN FILE *f)
+{
+    ErrorCode code = SUCCESS;
+    if (fscanf(f, "%zu", &pointArrSize) != 1)
+        code = INVALID_POINT_ARR_SIZE;
     return code;
 }

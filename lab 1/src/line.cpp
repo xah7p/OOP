@@ -14,7 +14,7 @@ ErrorCode LineRead(VAR Line &line, IN FILE *f)
     ErrorCode rc = SUCCESS;
     int tmpStartIndex, tmpEndIndex;
     if (fscanf(f, "%d%d", &tmpStartIndex, &tmpEndIndex) != 2 || tmpStartIndex < 0 || tmpEndIndex < 0 || tmpStartIndex == tmpEndIndex)
-        rc = INVALID_INPUT;
+        rc = INVALID_LINE_INPUT;
     else
         line = LineCreate((size_t) tmpStartIndex, (size_t) tmpEndIndex);
     return rc;
