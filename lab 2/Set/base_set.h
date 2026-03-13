@@ -12,8 +12,8 @@ public:
     virtual ~BaseSet() noexcept = default;
     virtual int size() const = 0;
     virtual bool isEmpty() const = 0;
-    virtual void clear() = 0;
+    virtual void clear() noexcept = 0;
 protected:
-    virtual void _CheckValidity() const = 0;
+    virtual void checkExpired() const = 0;
     std::shared_ptr<int> setSizePtr;
 };
