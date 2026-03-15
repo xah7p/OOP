@@ -18,27 +18,27 @@ typename ConstIterator<T>::pointer ConstIterator<T>::operator->() const {
 
 template<ContainerElementType T>
 ConstIterator<T>& ConstIterator<T>::operator++() noexcept {
-    index++;
+    ++index;
     return *this;
 }
 
 template<ContainerElementType T>
 ConstIterator<T> ConstIterator<T>::operator++(int) noexcept {
     auto tmp(*this);
-    index++;
+    ++index;
     return tmp;
 }
 
 template<ContainerElementType T>
 ConstIterator<T>& ConstIterator<T>::operator--() noexcept {
-    index--;
+    --index;
     return *this;
 }
 
 template<ContainerElementType T>
 ConstIterator<T> ConstIterator<T>::operator--(int) noexcept {
     auto tmp(*this);
-    index--;
+    --index;
     return tmp;
 }
 
@@ -74,7 +74,7 @@ ConstIterator<T>& ConstIterator<T>::operator+=(typename ConstIterator<T>::differ
 template<ContainerElementType T>
 ConstIterator<T> ConstIterator<T>::operator+(typename ConstIterator<T>::difference_type n) const noexcept {
     ConstIterator<T> it(*this);
-    index += n;
+    it.index += n;
     return it;
 }
 
@@ -92,7 +92,7 @@ ConstIterator<T>& ConstIterator<T>::operator-=(typename ConstIterator<T>::differ
 template<ContainerElementType T>
 ConstIterator<T> ConstIterator<T>::operator-(typename ConstIterator<T>::difference_type n) const noexcept {
     ConstIterator<T> it(*this);
-    index -= n;
+    it.index -= n;
     return it;
 }
 
@@ -102,7 +102,7 @@ typename ConstIterator<T>::difference_type ConstIterator<T>::operator-(const Con
 }
 
 template<ContainerElementType T>
-typename ConstIterator<T>::reference ConstIterator<T>::operator[](typename ConstIterator<T>::difference_type index) const noexcept {
+typename ConstIterator<T>::reference ConstIterator<T>::operator[](typename ConstIterator<T>::difference_type index) const {
     return *(*this + index);
 }
 
@@ -117,7 +117,7 @@ ConstIterator<T>::ConstIterator(const std::shared_ptr<T[]>& innerPtr,
 
 template<ContainerElementType T>
 typename ConstIterator<T>::pointer ConstIterator<T>::getCurrentPointer() const {
-    scheckExpiredContainer(__LINE__);
+    checkExpiredContainer(__LINE__);
     checkIndex(__LINE__);
     auto rawPtr = containerPtr.lock().get();
     return rawPtr + index;
@@ -136,7 +136,7 @@ void ConstIterator<T>::checkIndex(int line) const {
     checkExpiredContainer(line);
     if (index >= *(containerSize.lock())) {
         time_t t = time(nullptr);
-        throw InvalidIteratorIndex(__FILE__, typeid(*this).name(), line, ctime(&t));
+        throw InvalidIteratorIndexError(__FILE__, typeid(*this).name(), line, ctime(&t));
     }
 }
 

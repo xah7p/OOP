@@ -52,12 +52,26 @@ concept Container = CopyMoveConstructible<C> && std::destructible<C> && requires
     typename std::remove_reference_t<C>::iterator;
     typename std::remove_reference_t<C>::const_iterator;
 
+    { c.begin() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
+    { c.end() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
     { c.cbegin() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
     { c.cend() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
+    { c.size() } noexcept -> std::same_as<typename std::remove_reference_t<C>::size_type>;
 };
 
+template<ContainerElementType T>
+class Set; 
+
+template<typename C>
+concept IsSet = requires {
+    typename std::remove_reference_t<C>::value_type;
+} && std::same_as<
+    Set<typename std::remove_reference_t<C>::value_type>,
+    std::remove_reference_t<C>
+>;
+
 template<typename C, typename T>
-concept ConvertibleContainer = Container<C> && Convertible<typename std::remove_reference_t<C>::value_type, T>;
+concept ConvertibleContainer = !IsSet<C> && Container<C> && Convertible<typename std::remove_reference_t<C>::value_type, T>;
 
 template<typename It>
 concept InputIterator = std::input_iterator<It>;
@@ -72,4 +86,4 @@ template<typename R>
 concept InputRange = std::ranges::input_range<R>;
 
 template<typename R, typename T>
-concept ConvertibleInputRange = InputRange<R> && Convertible<std::ranges::range_value_t<R>, T>;
+concept ConvertibleInputRange = !IsSet<R> && InputRange<R> && Convertible<std::ranges::range_value_t<R>, T>;

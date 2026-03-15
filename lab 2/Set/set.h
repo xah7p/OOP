@@ -2,7 +2,7 @@
 
 #include "base_set.h"
 #include "const_iterator.h"
-#include "concepts.h"
+#include "myconcepts.h"
 #include <compare>
 #include <ranges>
 #include <memory>
@@ -26,40 +26,34 @@ public:
 
     Set(Set<T>&& other) noexcept;
 
-    Set(size_type size, const T* array); // TODO
+    Set(size_type size, const T* array);
 
     explicit Set(std::initializer_list<T> il); 
 
     // Конструкторы стандартные (шаблонные)
     template<Convertible<T> U>
-    Set(const Set<U>& other); // TODO
+    Set(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set(Set<T>&& other) noexcept; // TODO
+    Set(Set<U>&& other) noexcept;
 
     template<Convertible<T> U>
-    Set(size_type size, const U* array); // TODO
+    Set(size_type size, const U* array);
 
     template<Convertible<T> U>
-    explicit Set(std::initializer_list<U> il); // TODO
+    explicit Set(std::initializer_list<U> il);
 
-    // Конструкторы от range
+    // Конструктор от range
     template<ConvertibleInputRange<T> R>
-    Set(const R& range); // TODO
+    Set(R&& range);
 
-    template<ConvertibleInputRange<T> R>
-    Set(R&& range); // TODO
-
-    // Конструкторы от контейнера
+    // Конструктор от контейнера
     template<ConvertibleContainer<T> C>
-    Set(const C& Container); // TODO
-
-    template<ConvertibleContainer<T> C>
-    Set(C&& Container); // TODO
+    Set(C&& Container);
     
     // Конструктор от итератора
     template<ConvertibleInputIterator<T> It, Sentinel<It> S>
-    Set(const It& begin, const S& end); // TODO
+    Set(const It& beginIt, const S& endIt);
 
     // Деструктор
     ~Set() noexcept override = default;
@@ -69,145 +63,145 @@ public:
 
     Set<T>& operator=(Set&& other) noexcept;
 
-    Set<T>& operator=(std::initializer_list<T> il); // TODO
+    Set<T>& operator=(std::initializer_list<T> il);
 
     // Операторы присваивания стандартные (шаблонные)
     template<Convertible<T> U>
-    Set<T>& operator=(const Set<U>& other); // TODO
+    Set<T>& operator=(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator=(Set<U>&& other) noexcept; // TODO
+    Set<T>& operator=(Set<U>&& other) noexcept;
 
     template<Convertible<T> U>
-    Set<T>& operator=(std::initializer_list<U> il); // TODO
+    Set<T>& operator=(std::initializer_list<U> il);
 
-    // Операторы присваивания от range 
+    // Оператор присваивания от range 
     template<ConvertibleInputRange<T> R>
-    Set<T>& operator=(const R& range); // TODO
+    Set<T>& operator=(R&& range);
 
-    template<ConvertibleInputRange<T> R>
-    Set<T>& operator=(R&& range); // TODO
-
-    // Операторы присваивания от контейнера
+    // Оператор присваивания от контейнера
     template<ConvertibleContainer<T> C>
-    Set<T>& operator=(const C& container); // TODO
-
-    template<ConvertibleContainer<T> C>
-    Set<T>& operator=(C&& container); // TODO
+    Set<T>& operator=(C&& container);
     
     // Добавление
     template<Convertible<T> U>
-    bool add(const U& elem) noexcept; // TODO
+    bool add(const U& elem);
 
     template<Convertible<T> U>
-    Set<T> operator+(const U& elem) const; // TODO
+    Set<T>& operator+=(const U& elem);
+
+    template<Convertible<T> U>
+    Set<T> operator+(const U& elem) const;
 
     // Удаление
     template<Convertible<T> U>
-    bool erase(const U& elem) noexcept; // TODO
+    bool erase(const U& elem) noexcept;
+
+    template<Convertible<T> U>
+    Set<T>& operator-=(const U& elem) noexcept;
     
     template<Convertible<T> U>
-    Set<T> operator-(const U& elem) const; // TODO 
+    Set<T> operator-(const U& elem) const; 
 
     // Очистка
     void clear() noexcept override;
 
-    void operator!() noexcept; // TODO
+    void operator!() noexcept;
     
     // Наличие элемента
     template<Convertible<T> U>
-    [[nodiscard]] bool contains(const U& elem) const noexcept; // TODO 
+    [[nodiscard]] bool contains(const U& elem) const noexcept; 
 
     // Сравнение
     template<Convertible<T> U>
-    [[nodiscard]] bool operator==(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool operator==(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] std::strong_ordering operator<=>(const Set<U>&other) const noexcept; // TODO
+    [[nodiscard]] std::strong_ordering operator<=>(const Set<U>&other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool equal(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool equal(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool notEqual(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool notEqual(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool less(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool less(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool lessEqual(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool lessEqual(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool greater(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool greater(const Set<U>& other) const noexcept;
 
     template<Convertible<T> U>
-    [[nodiscard]] bool greaterEqual(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool greaterEqual(const Set<U>& other) const noexcept;
     
     template<Convertible<T> U>
-    [[nodiscard]] bool isSuperSetOf(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool isSuperSetOf(const Set<U>& other) const noexcept;
     
     template<Convertible<T> U>
-    [[nodiscard]] bool isSubSetOf(const Set<U>& other) const noexcept; // TODO
+    [[nodiscard]] bool isSubSetOf(const Set<U>& other) const noexcept;
 
     [[nodiscard]] explicit operator bool() const noexcept;
 
     // Объединение
     template<Convertible<T> U>
-    Set<T>& unity(const Set<U>& other) noexcept; // TODO
+    Set<T>& unity(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator+=(const Set<U>& other) noexcept; // TODO
+    Set<T>& operator+=(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator|=(const Set<U>& other) noexcept; // TODO
+    Set<T>& operator|=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator+(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator+(const Set<U>& other) const;
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator|(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator|(const Set<U>& other) const;
 
     // Разность
     template<Convertible<T> U>
-    Set<T>& difference(const Set<U>& other) noexcept; // TODO
+    Set<T>& difference(const Set<U>& other) noexcept;
 
     template<Convertible<T> U>
-    Set<T>& operator-=(const Set<U>& other) noexcept; // TODO
+    Set<T>& operator-=(const Set<U>& other) noexcept;
 
     template<Convertible<T> U>
-    Set<T>& operator/=(const Set<U>& other) noexcept; // TODO
+    Set<T>& operator/=(const Set<U>& other) noexcept;
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator-(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator-(const Set<U>& other) const;
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator/(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator/(const Set<U>& other) const;
 
     // Пересечение
     template<Convertible<T> U>
-    Set<T>& intersection(const Set<U>& other); // TODO
+    Set<T>& intersection(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator*=(const Set<U>& other); // TODO
+    Set<T>& operator*=(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator&=(const Set<U>& other); // TODO
+    Set<T>& operator&=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator*(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator*(const Set<U>& other) const;
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator&(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator&(const Set<U>& other) const;
 
     // Симметрическая разность
     template<Convertible<T> U>
-    Set<T>& symmetric_difference(const Set<U>& other); // TODO
+    Set<T>& symmetric_difference(const Set<U>& other);
 
     template<Convertible<T> U>
-    Set<T>& operator^=(const Set<U>& other); // TODO
+    Set<T>& operator^=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> operator^(const Set<U>& other) const; // TODO
+    Set<std::common_type_t<T, U>> operator^(const Set<U>& other) const;
 
     // Получение итератора
     iterator begin() const noexcept;
@@ -228,7 +222,7 @@ private:
     void regrow();
     std::shared_ptr<size_type> allocSharedSize(size_type size) const;
     std::shared_ptr<T[]> allocSharedInner(size_type capacity) const;
-    
+    void allocMemory(size_type size, size_type capacity);
     void checkExpired() const override;
     
     std::shared_ptr<T[]> setInnerPtr;

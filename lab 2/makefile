@@ -1,7 +1,7 @@
 CXX      := g++
-CXXFLAGS := -std=c++20 -Wall -Wextra -Wpedantic -Werror -O2
+CXXFLAGS := -std=c++23 -Wall -Wextra -Wpedantic -Werror -O2
 
-INCLUDES := -ISet -IException -IIterator
+INCLUDES := -ISet -IException -IIterator -IConcepts
 
 TARGET := app.exe
 OUT    := out

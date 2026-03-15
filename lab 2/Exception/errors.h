@@ -16,23 +16,37 @@ public:
         : BaseError(filename, classname, line, time, info) {};
 };
 
-class InvalidCapacityError:  public BaseError {
+class InvalidCPointerError:  public BaseError {
 public:
-    InvalidCapacityError(string filename, string classname, 
-        int line, string time, string info = "Expired size pointer!\n")
+    InvalidCPointerError(string filename, string classname, 
+        int line, string time, string info = "Invalid C pointer t!\n")
         : BaseError(filename, classname, line, time, info) {};
 };
 
-class InvalidIteratorIndex:  public BaseError {
+class InvalidSizeError:  public BaseError {
 public:
-    InvalidIteratorIndex(string filename, string classname, 
+    InvalidSizeError(string filename, string classname, 
+        int line, string time, string info = "Invalid size!\n")
+        : BaseError(filename, classname, line, time, info) {};
+};
+
+class InvalidCapacityError:  public BaseError {
+public:
+    InvalidCapacityError(string filename, string classname, 
+        int line, string time, string info = "Invalid capacity!\n")
+        : BaseError(filename, classname, line, time, info) {};
+};
+
+class InvalidIteratorIndexError:  public BaseError {
+public:
+    InvalidIteratorIndexError(string filename, string classname, 
         int line, string time, string info = "Invalid iterator index!\n")
         : BaseError(filename, classname, line, time, info) {};
 };
 
-class ComparingDifferentIterators:  public BaseError {
+class ComparingDifferentIteratorsError:  public BaseError {
 public:
-    ComparingDifferentIterators(string filename, string classname, 
+    ComparingDifferentIteratorsError(string filename, string classname, 
         int line, string time, string info = "comparing two different iterators!\n")
         : BaseError(filename, classname, line, time, info) {};
 };
