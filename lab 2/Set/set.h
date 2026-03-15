@@ -220,6 +220,7 @@ private:
     size_type find(const T& elem) const noexcept;
 
     void regrow();
+    void normalize() noexcept;
     std::shared_ptr<size_type> allocSharedSize(size_type size) const;
     std::shared_ptr<T[]> allocSharedInner(size_type capacity) const;
     void allocMemory(size_type size, size_type capacity);

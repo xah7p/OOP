@@ -40,6 +40,7 @@ Set<T>::Set(typename Set<T>::size_type size, const T* array) {
     }
     allocMemory(size, size > 0 ? size : INIT_SET_CAPACITY);
     std::ranges::copy(array, array + size, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -47,6 +48,7 @@ Set<T>::Set(std::initializer_list<T> args) {
     auto n = static_cast<typename Set<T>::size_type>(args.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
     std::ranges::copy(args, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -78,6 +80,7 @@ Set<T>::Set(typename Set<T>::size_type size, const U* array) {
     }
     allocMemory(size, size > 0 ? size : INIT_SET_CAPACITY);
     std::ranges::copy(array, array + size, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -86,6 +89,7 @@ Set<T>::Set(std::initializer_list<U> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
     std::ranges::copy(il, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -102,6 +106,7 @@ Set<T>::Set(R&& range) {
         std::ranges::move(range, setInnerPtr.get());
     else 
         std::ranges::copy(range, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -118,6 +123,7 @@ Set<T>::Set(C&& container) {
         std::ranges::move(container.begin(), container.end(), setInnerPtr.get());
     else 
         std::ranges::copy(container.cbegin(), container.cend(), setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -130,6 +136,7 @@ Set<T>::Set(const It& beginIt, const S& endIt) {
     }
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
     std::ranges::copy(beginIt, endIt, setInnerPtr.get());
+    normalize();
 }
 
 template<ContainerElementType T>
@@ -158,6 +165,7 @@ Set<T>& Set<T>::operator=(std::initializer_list<T> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
     std::ranges::copy(il, setInnerPtr.get());
+    normalize();
     return *this;
 }
 
@@ -185,6 +193,7 @@ Set<T>& Set<T>::operator=(std::initializer_list<U> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
     std::ranges::copy(il, setInnerPtr.get());
+    normalize();
     return *this;
 }
 
@@ -202,6 +211,7 @@ Set<T>& Set<T>::operator=(R&& range) {
         std::ranges::move(range, setInnerPtr.get());
     else 
         std::ranges::copy(range, setInnerPtr.get());
+    normalize();
     return *this;
 }
 
@@ -218,7 +228,8 @@ Set<T>& Set<T>::operator=(C&& container) {
     if constexpr (std::is_rvalue_reference_v<C&&>)
         std::ranges::move(container.begin(), container.end(), setInnerPtr.get());
     else 
-        std::ranges::copy(container.cbegin(), container.cend(), setInnerPtr.get());  
+        std::ranges::copy(container.cbegin(), container.cend(), setInnerPtr.get()); 
+    normalize();
     return *this;
 }
 
@@ -239,6 +250,7 @@ bool Set<T>::add(const U& elem) {
     std::ranges::move_backward(rawArrPtr + index, rawArrPtr + *setSizePtr, rawArrPtr + *setSizePtr + 1);
     rawArrPtr[index] = value;
     ++(*setSizePtr);
+    normalize();
     return true;
 }
 
@@ -613,6 +625,18 @@ void Set<T>::regrow() {
 
     setCapacity = newCapacity;
     setInnerPtr = std::move(newSetInnerPtr);
+}
+
+template<ContainerElementType T>
+void Set<T>::normalize() noexcept {
+    if (!setInnerPtr || !setSizePtr || *setSizePtr <= 1) return;
+
+    auto first = setInnerPtr.get();
+    auto last = first + *setSizePtr;
+
+    std::sort(first, last); 
+    auto newLast = std::unique(first, last);
+    *setSizePtr = static_cast<typename Set<T>::size_type>(newLast - first);
 }
 
 template<ContainerElementType T>
