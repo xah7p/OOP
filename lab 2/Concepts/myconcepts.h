@@ -17,30 +17,20 @@ template<typename T>
 concept CopyMoveAssignable = CopyAssignable<T> && MoveAssignable<T>;
 
 template<typename T>
-concept GreaterComparable = requires(const T& t1, const T& t2) {
-    { t1 < t2 } -> std::convertible_to<bool>;
-    { t2 < t1 } -> std::convertible_to<bool>;
-};
-
-template<typename T>
-concept EqualityComparable = requires(const T& t1, const T& t2) {
+concept Comparable = requires(const T& t1, const T& t2) {
+    { t1 <=> t2 } -> std::convertible_to<std::strong_ordering>;
     { t1 == t2 } -> std::convertible_to<bool>;
-    { t1 != t2 } -> std::convertible_to<bool>;
-    { t2 == t1 } -> std::convertible_to<bool>;
-    { t2 != t1 } -> std::convertible_to<bool>;
+
 };
 
 template<typename T>
-concept IncreasingComparable = GreaterComparable<T> && EqualityComparable<T>;
-
-template<typename T>
-concept ContainerElementType = CopyMoveAssignable<T> 
+concept SetElementType = CopyMoveAssignable<T> 
                             && CopyMoveConstructible<T>
                             && std::destructible<T> 
-                            && IncreasingComparable<T>;
+                            && Comparable<T>;
 
 template<typename From, typename To>
-concept Convertible = std::same_as<From, To> || std::convertible_to<From, To>;
+concept Convertible = std::convertible_to<From, To>;
 
 template<typename T, typename U>
 concept HasCommon = requires { typename std::common_type_t<T, U>; };
@@ -52,14 +42,12 @@ concept Container = CopyMoveConstructible<C> && std::destructible<C> && requires
     typename std::remove_reference_t<C>::iterator;
     typename std::remove_reference_t<C>::const_iterator;
 
-    { c.begin() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
-    { c.end() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
-    { c.cbegin() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
-    { c.cend() } noexcept -> std::same_as<typename std::remove_reference_t<C>::const_iterator>;
+    { c.begin() } noexcept -> std::same_as<typename std::remove_reference_t<C>::iterator>;
+    { c.end() } noexcept -> std::same_as<typename std::remove_reference_t<C>::iterator>;
     { c.size() } noexcept -> std::same_as<typename std::remove_reference_t<C>::size_type>;
 };
 
-template<ContainerElementType T>
+template<SetElementType T>
 class Set; 
 
 template<typename C>
@@ -67,14 +55,24 @@ concept IsSet = requires {
     typename std::remove_reference_t<C>::value_type;
 } && std::same_as<
     Set<typename std::remove_reference_t<C>::value_type>,
-    std::remove_reference_t<C>
->;
+    std::remove_reference_t<C>>;
 
 template<typename C, typename T>
 concept ConvertibleContainer = !IsSet<C> && Container<C> && Convertible<typename std::remove_reference_t<C>::value_type, T>;
 
 template<typename It>
 concept InputIterator = std::input_iterator<It>;
+
+template<typename It>
+concept Iterator = requires(It it) {
+    typename std::remove_reference_t<It>::pointer;
+    typename std::remove_reference_t<It>::reference;
+    typename std::remove_reference_t<It>::difference_type;
+    typename std::remove_reference_t<It>::iterator_category;
+    { ++it } noexcept -> std::same_as<It&>;
+    { it++ } noexcept -> std::same_as<It>;
+
+};
 
 template<typename It, typename T>
 concept ConvertibleInputIterator = InputIterator<It> && Convertible<typename std::remove_reference_t<It>::value_type, T>;
@@ -86,4 +84,4 @@ template<typename R>
 concept InputRange = std::ranges::input_range<R>;
 
 template<typename R, typename T>
-concept ConvertibleInputRange = !IsSet<R> && InputRange<R> && Convertible<std::ranges::range_value_t<R>, T>;
+concept ConvertibleInputRange = !ConvertibleContainer<R, T> && InputRange<R> && Convertible<std::ranges::range_value_t<R>, T>;

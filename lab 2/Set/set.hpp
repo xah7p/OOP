@@ -13,14 +13,14 @@
 #include <initializer_list>
 #include <ostream>
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>::Set(const Set<T>& other) {
     other.checkExpired();
     allocMemory(other.size(), other.setCapacity);
     std::ranges::copy(other.begin(), other.end(), setInnerPtr.get());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>::Set(Set<T>&& other) noexcept
     : setInnerPtr(std::move(other.setInnerPtr)), 
       setCapacity(other.setCapacity) {
@@ -28,7 +28,7 @@ Set<T>::Set(Set<T>&& other) noexcept
     other.setCapacity = 0;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>::Set(typename Set<T>::size_type size, const T* array) {
     if (size < 0) {
         time_t t = time(NULL);
@@ -43,7 +43,7 @@ Set<T>::Set(typename Set<T>::size_type size, const T* array) {
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>::Set(std::initializer_list<T> args) {
     auto n = static_cast<typename Set<T>::size_type>(args.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
@@ -51,7 +51,7 @@ Set<T>::Set(std::initializer_list<T> args) {
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>::Set(const Set<U>& other) {
     auto n = other.size(); 
@@ -59,15 +59,7 @@ Set<T>::Set(const Set<U>& other) {
     std::ranges::copy(other.begin(), other.end(), setInnerPtr.get());
 }
 
-template<ContainerElementType T>
-template<Convertible<T> U>
-Set<T>::Set(Set<U>&& other) noexcept {
-    auto n = other.size(); 
-    allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY); 
-    std::ranges::move(other.begin(), other.end(), setInnerPtr.get());
-}
-
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>::Set(typename Set<T>::size_type size, const U* array) {
     if (size < 0) {
@@ -83,7 +75,7 @@ Set<T>::Set(typename Set<T>::size_type size, const U* array) {
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>::Set(std::initializer_list<U> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
@@ -92,41 +84,33 @@ Set<T>::Set(std::initializer_list<U> il) {
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<ConvertibleInputRange<T> R>
-Set<T>::Set(R&& range) { 
+Set<T>::Set(const R& range) { 
     auto n = static_cast<typename Set<T>::size_type>(std::ranges::size(range));
     if (n < 0) {
         time_t t = time(nullptr);
         throw InvalidCapacityError(__FILE__, typeid(*this).name(), __LINE__, ctime(&t));
     }
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
-    
-    if constexpr (std::is_rvalue_reference_v<R&&>)
-        std::ranges::move(range, setInnerPtr.get());
-    else 
-        std::ranges::copy(range, setInnerPtr.get());
+    std::ranges::copy(range, setInnerPtr.get());
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<ConvertibleContainer<T> C>
-Set<T>::Set(C&& container) {
+Set<T>::Set(const C& container) {
     auto n = static_cast<typename Set<T>::size_type>(container.size());
     if (n < 0) {
         time_t t = time(nullptr);
         throw InvalidCapacityError(__FILE__, typeid(*this).name(), __LINE__, ctime(&t));
     }
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
-    
-    if constexpr (std::is_rvalue_reference_v<C&&>)
-        std::ranges::move(container.begin(), container.end(), setInnerPtr.get());
-    else 
-        std::ranges::copy(container.cbegin(), container.cend(), setInnerPtr.get());
+    std::ranges::copy(container.begin(), container.end(), setInnerPtr.get());
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<ConvertibleInputIterator<T> It, Sentinel<It> S>
 Set<T>::Set(const It& beginIt, const S& endIt) {
     auto n = static_cast<typename Set<T>::size_type>(std::ranges::distance(beginIt, endIt));
@@ -139,7 +123,7 @@ Set<T>::Set(const It& beginIt, const S& endIt) {
     normalize();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>& Set<T>::operator=(const Set<T>& other) {
     if (this != &other) {
         other.checkExpired();
@@ -149,7 +133,7 @@ Set<T>& Set<T>::operator=(const Set<T>& other) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>& Set<T>::operator=(Set<T>&& other) noexcept {
     if (this != &other) {
         setSizePtr = std::move(other.setSizePtr);
@@ -160,7 +144,7 @@ Set<T>& Set<T>::operator=(Set<T>&& other) noexcept {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>& Set<T>::operator=(std::initializer_list<T> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
@@ -169,7 +153,7 @@ Set<T>& Set<T>::operator=(std::initializer_list<T> il) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator=(const Set<U>& other) {
     auto n = other.size(); 
@@ -178,16 +162,7 @@ Set<T>& Set<T>::operator=(const Set<U>& other) {
     return *this;
 }
 
-template<ContainerElementType T>
-template<Convertible<T> U>
-Set<T>& Set<T>::operator=(Set<U>&& other) noexcept {
-    auto n = other.size(); 
-    allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY); 
-    std::ranges::move(other.begin(), other.end(), setInnerPtr.get()); 
-    return *this;
-}
-
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator=(std::initializer_list<U> il) {
     auto n = static_cast<typename Set<T>::size_type>(il.size());
@@ -197,9 +172,9 @@ Set<T>& Set<T>::operator=(std::initializer_list<U> il) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<ConvertibleInputRange<T> R>
-Set<T>& Set<T>::operator=(R&& range) {
+Set<T>& Set<T>::operator=(const R& range) {
     auto n = static_cast<typename Set<T>::size_type>(std::ranges::size(range));
     if (n < 0) {
         time_t t = time(nullptr);
@@ -207,17 +182,14 @@ Set<T>& Set<T>::operator=(R&& range) {
     }
     
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
-    if constexpr (std::is_rvalue_reference_v<R&&>)
-        std::ranges::move(range, setInnerPtr.get());
-    else 
-        std::ranges::copy(range, setInnerPtr.get());
+    std::ranges::copy(range, setInnerPtr.get());
     normalize();
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<ConvertibleContainer<T> C>
-Set<T>& Set<T>::operator=(C&& container) {
+Set<T>& Set<T>::operator=(const C& container) {
     auto n = static_cast<typename Set<T>::size_type>(container.size());
     if (n < 0) {
         time_t t = time(nullptr);
@@ -225,15 +197,12 @@ Set<T>& Set<T>::operator=(C&& container) {
     }
     
     allocMemory(n, n > 0 ? n : INIT_SET_CAPACITY);
-    if constexpr (std::is_rvalue_reference_v<C&&>)
-        std::ranges::move(container.begin(), container.end(), setInnerPtr.get());
-    else 
-        std::ranges::copy(container.cbegin(), container.cend(), setInnerPtr.get()); 
+    std::ranges::copy(container.begin(), container.end(), setInnerPtr.get()); 
     normalize();
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::add(const U& elem) {
     T value = static_cast<T>(elem);
@@ -254,14 +223,21 @@ bool Set<T>::add(const U& elem) {
     return true;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator+=(const U& elem) {
     add(elem);
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T, Convertible<T> U>
+Set<T> operator+(const U& elem, Set<T> set) {
+    auto tmpSet(set);
+    tmpSet.add(elem);
+    return tmpSet;
+}
+
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T> Set<T>::operator+(const U& elem) const {
     auto tmpSet(*this);
@@ -269,7 +245,7 @@ Set<T> Set<T>::operator+(const U& elem) const {
     return tmpSet;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::erase(const U& elem) noexcept {
     T value = static_cast<T>(elem);
@@ -286,14 +262,14 @@ bool Set<T>::erase(const U& elem) noexcept {
     return true;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator-=(const U& elem) noexcept {
     erase(elem);
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T> Set<T>::operator-(const U& elem) const {
     auto tmpSet(*this);
@@ -301,19 +277,19 @@ Set<T> Set<T>::operator-(const U& elem) const {
     return tmpSet;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 void Set<T>::clear() noexcept {
     if (setSizePtr) *setSizePtr = 0;
     if (setInnerPtr) setInnerPtr = allocSharedInner(INIT_SET_CAPACITY); 
 }
 
 
-template<ContainerElementType T>
+template<SetElementType T>
 void Set<T>::operator!() noexcept {
     clear();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::contains(const U& elem) const noexcept {
     T value = static_cast<T>(elem);
@@ -322,7 +298,7 @@ bool Set<T>::contains(const U& elem) const noexcept {
     return index < *setSizePtr && setInnerPtr.get()[index] == value;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::operator==(const Set<U>& other) const noexcept {
     if (*setSizePtr != other.size()) {
@@ -331,68 +307,68 @@ bool Set<T>::operator==(const Set<U>& other) const noexcept {
     return std::ranges::equal(*this, other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 std::strong_ordering Set<T>::operator<=>(const Set<U>& other) const noexcept {
     return std::lexicographical_compare_three_way(begin(), end(), other.begin(), other.end());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::equal(const Set<U>& other) const noexcept {
     return *this == other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::notEqual(const Set<U>& other) const noexcept {
     return *this != other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::less(const Set<U>& other) const noexcept {
     return *this < other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::lessEqual(const Set<U>& other) const noexcept {
     return *this <= other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::greater(const Set<U>& other) const noexcept {
     return *this > other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::greaterEqual(const Set<U>& other) const noexcept {
     return *this >= other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::isSuperSetOf(const Set<U>& other) const noexcept {
     if (!setSizePtr || ! setInnerPtr) return false;
     return std::ranges::includes(*this, other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 bool Set<T>::isSubSetOf(const Set<U>& other) const noexcept {
     return std::ranges::includes(other, *this);
 
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 Set<T>::operator bool() const noexcept {
     return setSizePtr && setInnerPtr;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::unity(const Set<U>& other) {
     if (other.isEmpty()) return *this;
@@ -411,32 +387,39 @@ Set<T>& Set<T>::unity(const Set<U>& other) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator+=(const Set<U>& other) {
     return unity(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator|=(const Set<U>& other) {
     return unity(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
+template<HasCommon<T> U>
+Set<std::common_type_t<T, U>> Set<T>::make_union(const Set<U>& other) const {
+    Set<T> newSet(*this);
+    return newSet.unity(other);
+}
+
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator+(const Set<U>& other) const {
     Set<T> newSet(*this);
     return newSet.unity(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator|(const Set<U>& other) const {
     return *this + other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::difference(const Set<U>& other) noexcept {
         if (other.isEmpty()) return *this;
@@ -455,32 +438,39 @@ Set<T>& Set<T>::difference(const Set<U>& other) noexcept {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator-=(const Set<U>& other) noexcept {
     return difference(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator/=(const Set<U>& other) noexcept {
     return difference(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
+template<HasCommon<T> U>
+Set<std::common_type_t<T, U>> Set<T>::make_difference(const Set<U>& other) const {
+    Set<T> newSet(*this);
+    return newSet.difference(other);
+}
+
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator-(const Set<U>& other) const {
     Set<T> newSet(*this);
     return newSet.difference(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator/(const Set<U>& other) const {
     return *this - other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::intersection(const Set<U>& other) {
     if (other.isEmpty()) return *this;
@@ -499,32 +489,39 @@ Set<T>& Set<T>::intersection(const Set<U>& other) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator*=(const Set<U>& other) {
     return intersection(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator&=(const Set<U>& other) {
     return intersection(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
+template<HasCommon<T> U>
+Set<std::common_type_t<T, U>> Set<T>::make_intersection(const Set<U>& other) const {
+    Set<T> newSet(*this);
+    return newSet.intersection(other);
+}
+
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator*(const Set<U>& other) const {
     Set<T> newSet(*this);
     return newSet.intersection(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator&(const Set<U>& other) const {
     return *this * other;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::symmetric_difference(const Set<U>& other) {
     if (other.isEmpty()) return *this;
@@ -543,80 +540,92 @@ Set<T>& Set<T>::symmetric_difference(const Set<U>& other) {
     return *this;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 template<Convertible<T> U>
 Set<T>& Set<T>::operator^=(const Set<U>& other) {
     return symmetric_difference(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
+template<HasCommon<T> U>
+Set<std::common_type_t<T, U>> Set<T>::make_symmetric_difference(const Set<U>& other) const {
+    Set<T> newSet(*this);
+    return newSet.symmetric_difference(other);
+}
+
+template<SetElementType T>
 template<HasCommon<T> U>
 Set<std::common_type_t<T, U>> Set<T>::operator^(const Set<U>& other) const {
     Set<T> newSet(*this);
     return newSet.symmetric_difference(other);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::iterator Set<T>::begin() const noexcept {
     return typename Set<T>::iterator(setInnerPtr, setSizePtr, 0);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::iterator Set<T>::end() const noexcept {
     if (!setSizePtr) return begin();
     return begin() + *setSizePtr;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::const_iterator Set<T>::cbegin() const noexcept {
     return begin();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::const_iterator Set<T>::cend() const noexcept {
     return end();
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::reverse_iterator Set<T>::rbegin() const noexcept {
     return std::reverse_iterator(end());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::reverse_iterator Set<T>::rend() const noexcept {
     return std::reverse_iterator(begin());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::const_reverse_iterator Set<T>::crbegin() const noexcept {
     return std::reverse_iterator(end());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::const_reverse_iterator Set<T>::crend() const noexcept {
     return std::reverse_iterator(begin());
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
+typename Set<T>::size_type Set<T>::power() const noexcept {
+    return size();
+}
+
+template<SetElementType T>
 typename Set<T>::size_type Set<T>::size() const noexcept {
     if (!setSizePtr) return 0;
     return *setSizePtr;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 bool Set<T>::isEmpty() const noexcept {
     if (!setSizePtr) return true;
     return *setSizePtr == 0;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 typename Set<T>::size_type Set<T>::find(const T& elem) const noexcept {
     if (!setSizePtr || !setInnerPtr) return -1;
     auto it = std::ranges::lower_bound(cbegin(), cend(), elem);
     return static_cast<typename Set<T>::size_type>(std::ranges::distance(cbegin(), it));
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 void Set<T>::regrow() {
     typename Set<T>::size_type newCapacity =
         setCapacity > 0 ? setCapacity * 2 : INIT_SET_CAPACITY;
@@ -627,7 +636,7 @@ void Set<T>::regrow() {
     setInnerPtr = std::move(newSetInnerPtr);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 void Set<T>::normalize() noexcept {
     if (!setInnerPtr || !setSizePtr || *setSizePtr <= 1) return;
 
@@ -639,7 +648,7 @@ void Set<T>::normalize() noexcept {
     *setSizePtr = static_cast<typename Set<T>::size_type>(newLast - first);
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 std::shared_ptr<typename Set<T>::size_type>
 Set<T>::allocSharedSize(typename Set<T>::size_type size) const {
     if (size < 0) {
@@ -654,7 +663,7 @@ Set<T>::allocSharedSize(typename Set<T>::size_type size) const {
     }
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 std::shared_ptr<T[]> Set<T>::allocSharedInner(typename Set<T>::size_type capacity) const {
     if (capacity < 0) {
         time_t t = time(nullptr);
@@ -670,7 +679,7 @@ std::shared_ptr<T[]> Set<T>::allocSharedInner(typename Set<T>::size_type capacit
     }
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 void Set<T>::checkExpired() const {
     if (!setSizePtr || !setInnerPtr) {
         time_t t = time(nullptr);
@@ -678,14 +687,14 @@ void Set<T>::checkExpired() const {
     }
 }
 
-template <ContainerElementType T> 
+template <SetElementType T> 
 void Set<T>::allocMemory(typename Set<T>::size_type size, typename Set<T>::size_type capacity) {
     setSizePtr = allocSharedSize(size);
     setInnerPtr = allocSharedInner(capacity);
     setCapacity = capacity;
 }
 
-template<ContainerElementType T>
+template<SetElementType T>
 std::ostream& operator<<(std::ostream& os, const Set<T>& s) {
     os << "{ ";
     std::ranges::copy(s, std::ostream_iterator<T>(os, " "));

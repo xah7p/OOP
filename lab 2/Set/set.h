@@ -8,7 +8,7 @@
 #include <memory>
 #include <initializer_list>
 
-template<ContainerElementType T>
+template<SetElementType T>
 class Set final: public BaseSet {
 public:
     // Алиасы
@@ -19,7 +19,7 @@ public:
     using reverse_iterator = std::reverse_iterator<ConstIterator<T>>;
     using const_reverse_iterator = std::reverse_iterator<ConstIterator<T>>;
 
-    // Конструкторы стандартные (не шаблонные)
+    // Конструкторы стандартные
     Set() noexcept = default;
 
     Set(const Set<T>& other);
@@ -30,12 +30,8 @@ public:
 
     explicit Set(std::initializer_list<T> il); 
 
-    // Конструкторы стандартные (шаблонные)
     template<Convertible<T> U>
-    Set(const Set<U>& other);
-
-    template<Convertible<T> U>
-    Set(Set<U>&& other) noexcept;
+    explicit Set(const Set<U>& other);
 
     template<Convertible<T> U>
     Set(size_type size, const U* array);
@@ -45,11 +41,11 @@ public:
 
     // Конструктор от range
     template<ConvertibleInputRange<T> R>
-    Set(R&& range);
+    explicit Set(const R& range);
 
     // Конструктор от контейнера
     template<ConvertibleContainer<T> C>
-    Set(C&& Container);
+    explicit Set(const C& Container);
     
     // Конструктор от итератора
     template<ConvertibleInputIterator<T> It, Sentinel<It> S>
@@ -58,30 +54,26 @@ public:
     // Деструктор
     ~Set() noexcept override = default;
 
-    // Операторы присваивания стандартные (не шаблонные)
+    // Операторы присваивания стандартные
     Set<T>& operator=(const Set& other);
 
     Set<T>& operator=(Set&& other) noexcept;
 
     Set<T>& operator=(std::initializer_list<T> il);
 
-    // Операторы присваивания стандартные (шаблонные)
     template<Convertible<T> U>
     Set<T>& operator=(const Set<U>& other);
-
-    template<Convertible<T> U>
-    Set<T>& operator=(Set<U>&& other) noexcept;
 
     template<Convertible<T> U>
     Set<T>& operator=(std::initializer_list<U> il);
 
     // Оператор присваивания от range 
     template<ConvertibleInputRange<T> R>
-    Set<T>& operator=(R&& range);
+    Set<T>& operator=(const R& range);
 
     // Оператор присваивания от контейнера
     template<ConvertibleContainer<T> C>
-    Set<T>& operator=(C&& container);
+    Set<T>& operator=(const C& container);
     
     // Добавление
     template<Convertible<T> U>
@@ -156,6 +148,9 @@ public:
     Set<T>& operator|=(const Set<U>& other);
 
     template<HasCommon<T> U>
+    Set<std::common_type_t<T, U>> make_union(const Set<U>& other) const;
+
+    template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator+(const Set<U>& other) const;
 
     template<HasCommon<T> U>
@@ -170,6 +165,9 @@ public:
 
     template<Convertible<T> U>
     Set<T>& operator/=(const Set<U>& other) noexcept;
+
+    template<HasCommon<T> U>
+    Set<std::common_type_t<T, U>> make_difference(const Set<U>& other) const;
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator-(const Set<U>& other) const;
@@ -188,6 +186,9 @@ public:
     Set<T>& operator&=(const Set<U>& other);
 
     template<HasCommon<T> U>
+    Set<std::common_type_t<T, U>> make_intersection(const Set<U>& other) const;
+
+    template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator*(const Set<U>& other) const;
 
     template<HasCommon<T> U>
@@ -199,6 +200,9 @@ public:
 
     template<Convertible<T> U>
     Set<T>& operator^=(const Set<U>& other);
+
+    template<HasCommon<T> U>
+    Set<std::common_type_t<T, U>> make_symmetric_difference(const Set<U>& other) const;
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator^(const Set<U>& other) const;
@@ -214,6 +218,7 @@ public:
     const_reverse_iterator crend() const noexcept;
 
     // Проверка размера
+    [[nodiscard]] size_type power() const noexcept override;
     [[nodiscard]] size_type size() const noexcept override;
     [[nodiscard]] bool isEmpty() const noexcept override;
 private:
@@ -228,8 +233,13 @@ private:
     
     std::shared_ptr<T[]> setInnerPtr;
     int setCapacity;
+
 };
+
+template<SetElementType T, Convertible<T> U>
+Set<T> operator+(const U& elem, Set<T> set);
 
 #include "set.hpp"
 
 static_assert(std::ranges::contiguous_range<Set<int>>);
+static_assert(Container<Set<int>>);
