@@ -148,7 +148,7 @@ public:
     Set<T>& operator|=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> make_union(const Set<U>& other) const;
+    Set<std::common_type_t<T, U>> make_union(const Set<U>& other) const; //
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator+(const Set<U>& other) const;
@@ -167,7 +167,7 @@ public:
     Set<T>& operator/=(const Set<U>& other) noexcept;
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> make_difference(const Set<U>& other) const;
+    Set<std::common_type_t<T, U>> make_difference(const Set<U>& other) const; //
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator-(const Set<U>& other) const;
@@ -186,7 +186,7 @@ public:
     Set<T>& operator&=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> make_intersection(const Set<U>& other) const;
+    Set<std::common_type_t<T, U>> make_intersection(const Set<U>& other) const; //
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator*(const Set<U>& other) const;
@@ -202,7 +202,7 @@ public:
     Set<T>& operator^=(const Set<U>& other);
 
     template<HasCommon<T> U>
-    Set<std::common_type_t<T, U>> make_symmetric_difference(const Set<U>& other) const;
+    Set<std::common_type_t<T, U>> make_symmetric_difference(const Set<U>& other) const; //
 
     template<HasCommon<T> U>
     Set<std::common_type_t<T, U>> operator^(const Set<U>& other) const;
@@ -218,7 +218,7 @@ public:
     const_reverse_iterator crend() const noexcept;
 
     // Проверка размера
-    [[nodiscard]] size_type power() const noexcept override;
+    [[nodiscard]] size_type power() const noexcept override; //
     [[nodiscard]] size_type size() const noexcept override;
     [[nodiscard]] bool isEmpty() const noexcept override;
 private:
