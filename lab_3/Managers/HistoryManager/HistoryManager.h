@@ -9,7 +9,7 @@ class HistoryManager : public BaseManager {
 private:
     std::shared_ptr<Caretaker> caretaker;
 public:
-    HistoryManager() = default;
+    HistoryManager();
     virtual ~HistoryManager() = default;
 
     void saveState(EntityId id);

@@ -16,7 +16,7 @@ private:
     double nearZ;
     double farZ;
 protected:
-    std::shared_ptr<BaseEntity> createProduct() override;
+    std::shared_ptr<BaseEntity> createEntity() override;
 public:
     DefaultCameraBuilder() = delete;
     explicit DefaultCameraBuilder(std::shared_ptr<DefaultCameraReader> reader);

@@ -21,7 +21,7 @@ public:
     DrawVisitor& operator=(const DrawVisitor& other) = default;
     DrawVisitor& operator=(DrawVisitor&& other) = default;
 
-    virtual ~DrawVisitor() = default;
+    virtual ~DrawVisitor() override;
 
     virtual void visit(std::shared_ptr<CarcassModelStructure>) const override;
     virtual void visit(std::shared_ptr<CameraEntityStructure>) const override;
@@ -31,4 +31,6 @@ protected:
     std::shared_ptr<BaseCenterStrategy> centerStrategy;
     std::shared_ptr<BaseProjectionStrategy> projectionStrategy;
     std::shared_ptr<BaseRemovingInvisibleLinesStrategy> removingInvisibleLinesStrategy;
+    mutable std::vector<Vertex> collectedVertices;
+    mutable std::vector<Edge> collectedEdges;
 };

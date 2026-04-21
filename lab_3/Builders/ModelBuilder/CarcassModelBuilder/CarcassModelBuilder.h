@@ -10,7 +10,7 @@ class CarcassModelBuilder: public BaseModelBuilder {
 private:
     std::shared_ptr<CarcassModelStructure> structure;
 protected:
-    std::shared_ptr<BaseEntity> createProduct() override;
+    std::shared_ptr<BaseEntity> createEntity() override;
 public:
     CarcassModelBuilder() = delete;
     CarcassModelBuilder(std::shared_ptr<CarcassModelReader> reader, std::shared_ptr<CarcassModelStructure> structure);

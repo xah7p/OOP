@@ -1,11 +1,13 @@
 #pragma once
 
 #include <memory>
-#include <QtGraphicsScene>
+#include <QGraphicsScene>
 #include "BasePainter.h"
 #include "BaseDrawFactory.h"
 
 class QtDrawFactory: public BaseDrawFactory {
+private:
+    std::shared_ptr<QGraphicsScene> scene;
 public: 
     QtDrawFactory() = delete;
     QtDrawFactory(std::shared_ptr<QGraphicsScene> scene);

@@ -5,7 +5,10 @@
 #include <initializer_list>
 #include <memory>
 
-class Composite : BaseEntity {
+class Composite : public BaseEntity {
+private:
+    BaseEntityMap entities;
+    size_t size = 0;
 public:
     Composite() = default;
     Composite(BaseEntityPtr first, ...);
@@ -30,6 +33,6 @@ public:
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
 
-    // virtual std::unique_ptr<Memento> createMemento() const override;
-    // virtual void restoreMemento(std::unique_ptr<Memento>) override;
+    virtual std::unique_ptr<Memento> createMemento() const override;
+    virtual void restoreMemento(std::unique_ptr<Memento>) override;
 };

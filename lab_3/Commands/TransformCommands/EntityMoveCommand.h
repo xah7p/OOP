@@ -10,10 +10,12 @@ class EntityMoveCommand: public BaseTransformCommand {
 private:
     using ManagerMethod = void (TransformManager::*)(EntityId, const MoveArgs&);
 
+    EntityId entityId;
+    MoveArgs args;
     ManagerMethod method;
     std::shared_ptr<TransformManager> manager;
 public:
-    EntityMoveCommand();
+    EntityMoveCommand(EntityId id, const MoveArgs& args);
     virtual ~EntityMoveCommand() override = default;
 
     void execute() override;

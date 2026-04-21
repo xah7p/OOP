@@ -19,6 +19,7 @@ public:
     virtual ~CarcassModelEntity() override = default;
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
+    std::shared_ptr<CarcassModelStructure> getStructure() const noexcept;
 
     virtual std::unique_ptr<Memento> createMemento() const override;
     virtual void restoreMemento(std::unique_ptr<Memento>) override;

@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <vector>
 #include <concepts>
+#include <stdexcept>
 
 template <std::convertible_to<double> T>
 class Matrix
@@ -56,4 +57,6 @@ public:
     Matrix<T> operator-() const;
 
     std::vector<T>& operator[](size_t row);
+    const std::vector<T>& operator[](size_t row) const;
 };
+

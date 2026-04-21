@@ -31,12 +31,12 @@ public:
     double getZ() const noexcept;
     double getW() const noexcept;
 
-    double setX() noexcept;
-    double setY() noexcept;
-    double setZ() noexcept;
-    double setW() noexcept;
+    void setX(double value) noexcept;
+    void setY(double value) noexcept;
+    void setZ(double value) noexcept;
+    void setW(double value) noexcept;
 
-    std::strong_ordering operator<=>(const Vertex& other) const noexcept = default;
+    std::partial_ordering operator<=>(const Vertex& other) const noexcept = default;
     bool equal(const Vertex& other) const noexcept;
     bool notEqual(const Vertex& other) const noexcept;
     bool lessEqual(const Vertex& other) const noexcept;
@@ -57,7 +57,7 @@ public:
     Vertex operator-(const Vertex& other) const;
 
     double distance(const Vertex& other) const noexcept;
-    void transform(std::shared_ptr<TransformData>) const noexcept;
+    void transform(std::shared_ptr<TransformData>) noexcept;
 };
 
 std::ostream& operator<<(std::ostream& os, const Vertex& vertex);

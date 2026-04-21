@@ -2,6 +2,7 @@
 
 #include "Vertex.h"
 #include "Matrix.h"
+#include "TransformData.h"
 #include <memory>
 
 class BaseVisitor;

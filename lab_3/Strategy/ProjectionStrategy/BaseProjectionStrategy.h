@@ -9,7 +9,8 @@ public:
     BaseProjectionStrategy() = default;
     virtual ~BaseProjectionStrategy() = default;
 
-    virtual void prepare(std::vector<Vertex>& projectedVertexes, 
+    virtual void prepare(std::vector<Vertex>& projectedVertexes,
         std::shared_ptr<CarcassModelStructure>,
-        std::shared_ptr<CameraEntityStructure>) = 0;
+        std::shared_ptr<CameraEntityStructure>,
+        double aspectRatio) = 0;
 };

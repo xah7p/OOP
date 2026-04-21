@@ -20,4 +20,7 @@ public:
 
     Matrix4& multiply(const Matrix4& other);
     Matrix4& operator*=(const Matrix4& other);
+
+    const Matrix<double>& getMatrix() const noexcept;
+    Matrix<double>& getMatrix() noexcept;
 };

@@ -7,7 +7,7 @@
 class Scene {
 private:
     BaseEntityMap entities;  
-    size_t size;
+    size_t size = 0;
     Scene() = default;
 public:
     using value_type = BaseEntityPtr;
@@ -31,7 +31,7 @@ public:
 
     [[nodiscard]] bool addEntity(std::shared_ptr<BaseEntity>);
     [[nodiscard]] bool removeEntity(EntityId id);
-    std::shared_ptr<BaseEntity> getEntity();
+    std::shared_ptr<BaseEntity> getEntity(EntityId id);
 
     iterator begin();
     iterator end();
@@ -40,4 +40,5 @@ public:
     const_iterator cend();
 
     void accept(std::shared_ptr<BaseVisitor>);
+    void clear();
 };

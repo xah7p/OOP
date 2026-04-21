@@ -10,7 +10,7 @@ private:
     ManagerMethod method;
     std::shared_ptr<DrawManager> manager;
 public:
-    DrawCommand() = default;
+    DrawCommand();
     virtual ~DrawCommand() override = default;
 
     void execute() override;

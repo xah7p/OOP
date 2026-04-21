@@ -9,7 +9,7 @@ class MatrixCarcassModelStructure : public CarcassModelStructure {
 private:
     std::vector<Vertex> vertixes;
     std::vector<std::vector<bool>> adjancencyMatrix;
-    size_t sizeMatr;
+    size_t sizeMatr = 0;
 public:
     MatrixCarcassModelStructure() = default;
     virtual ~MatrixCarcassModelStructure() = default;

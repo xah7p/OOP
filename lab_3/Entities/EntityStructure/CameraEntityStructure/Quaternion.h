@@ -22,6 +22,10 @@ public:
     Quaternion normalized() const noexcept;
     Quaternion conjugate() const noexcept;
     Quaternion inverse() const noexcept;
+    Quaternion multiply(const Quaternion& other) const noexcept;
+    Quaternion operator*(const Quaternion& other) const noexcept;
+
+    static Quaternion fromRotationMatrix(const Matrix<double>& matrix) noexcept;
 
     Matrix4 toRotationMatrix4() const;
 };
