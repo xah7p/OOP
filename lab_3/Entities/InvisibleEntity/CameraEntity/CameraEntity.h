@@ -21,6 +21,6 @@ public:
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
 
-    // virtual std::unique_ptr<Memento> createMemento() const override;
-    // virtual void restoreMemento(std::unique_ptr<Memento>) override;
+    virtual std::unique_ptr<Memento> createMemento() const override;
+    virtual void restoreMemento(std::unique_ptr<Memento>) override;
 };

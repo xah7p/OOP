@@ -1,6 +1,5 @@
 #pragma once
 
-#include "TransformState.h"
 #include "BaseVisitor.h"
 #include "Memento.h"
 
@@ -36,6 +35,6 @@ public:
 
     virtual void accept(std::shared_ptr<BaseVisitor>) = 0;
 
-    // virtual std::unique_ptr<Memento> createMemento() const = 0;
-    // virtual void restoreMemento(std::unique_ptr<Memento>) = 0;
+    virtual std::unique_ptr<Memento> createMemento() const = 0;
+    virtual void restoreMemento(std::unique_ptr<Memento>) = 0;
 };

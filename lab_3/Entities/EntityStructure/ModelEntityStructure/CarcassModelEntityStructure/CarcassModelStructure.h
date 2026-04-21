@@ -3,6 +3,8 @@
 #include "vector"
 #include "Vertex.h"
 #include "Edge.h"
+#include "TransformData.h"
+#include <memory>
 
 class CarcassModelStructure {
 protected:
@@ -15,7 +17,7 @@ public:
     virtual void addVertex(const Vertex& vertex) = 0;
     virtual void addEdge(const Edge& edge) = 0;
 
-    virtual void transform() = 0;
+    virtual void transform(std::shared_ptr<TransformData>) = 0;
 
     virtual Vertex getCenter() noexcept { return center; }
     virtual std::vector<Vertex> getVertices() const noexcept = 0;

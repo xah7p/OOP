@@ -1,8 +1,10 @@
 #pragma once
 
+#include "TransformData.h"
 #include <iostream>
 #include <compare>
 #include <ostream>
+#include <memory>
 
 class TransformState;
 
@@ -55,7 +57,7 @@ public:
     Vertex operator-(const Vertex& other) const;
 
     double distance(const Vertex& other) const noexcept;
-    void transform(const TransformState& transformState) const noexcept;
+    void transform(std::shared_ptr<TransformData>) const noexcept;
 };
 
 std::ostream& operator<<(std::ostream& os, const Vertex& vertex);

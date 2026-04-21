@@ -16,7 +16,7 @@ public:
     virtual const Matrix<double> getLookMatrix() const noexcept = 0;
     virtual const Matrix<double> getProjectionMatrix(double aspectRatio) const noexcept = 0;
 
-    virtual void transform(const std::shared_ptr<TransformState> state) = 0;
+    virtual void transform(std::shared_ptr<TransformData>) = 0;
     virtual void accept(std::shared_ptr<BaseVisitor> visitor) = 0;
     virtual Vertex getViewpoint() const noexcept = 0;
 };

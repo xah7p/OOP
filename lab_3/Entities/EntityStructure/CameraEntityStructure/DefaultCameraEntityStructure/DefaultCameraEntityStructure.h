@@ -17,7 +17,7 @@ public:
     const Matrix<double> getLookMatrix() const noexcept override;
     const Matrix<double> getProjectionMatrix(double aspectRatio) const noexcept override;
 
-    void transform(const std::shared_ptr<TransformState> state) override;
+    void transform(std::shared_ptr<TransformData>) override;
     void accept(std::shared_ptr<BaseVisitor> visitor) override;
     Vertex getViewpoint() const noexcept override;
 };

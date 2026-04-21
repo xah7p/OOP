@@ -8,6 +8,7 @@
 #include "LoadDirectorSolution.h"
 #include "LoadRequest.h"
 #include "LoadStrategy.h"
+#include "EntityId.h"
 
 class LoadManager: public BaseManager {
 private:
@@ -20,5 +21,5 @@ public:
     LoadManager();
     virtual ~LoadManager() override = default;
 
-    void loadEntity(const LoadRequest& req);
+    void loadEntity(EntityId id, const LoadRequest& req);
 };

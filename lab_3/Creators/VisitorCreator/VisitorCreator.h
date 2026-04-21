@@ -1,30 +1,41 @@
 #pragma once
 
 #include "Concepts.h"
-#include <memory>
-#include "BaseVisitor.h"
+#include "TransformArgs.h"
+
 #include "RotateVisitor.h"
+#include "BaseVisitor.h"
 #include "MoveVisitor.h"
+#include "RotateVisitor.h"
 #include "ScaleVisitor.h"
 
-class BaseVisitor;
+#include "DrawVisitor.h"
+#include "BasePainter.h"
+#include "BaseCameraEntity.h"
 
-class BaseVisitorCreator {
+#include <memory>
+
+template <typename AbstractVisitor, typename DerivedVisitor, typename... Args>
+requires Derivative<DerivedVisitor, AbstractVisitor> && Constructible<DerivedVisitor, Args...>
+class VisitorCreator
+{
 public:
-    template<Derivative<BaseVisitor> Visitor, typename... Args>
-    requires NotAbstract<Visitor> && Constructible<Visitor, Args...>
-    static std::unique_ptr<BaseVisitor> create(Args&& ...args) {
-        return std::make_unique<BaseVisitor>(forward<Args>(args)...);
-    }
+    VisitorCreator() = default;
+    ~VisitorCreator() = default;
+
+    template <typename... CallArgs>
+    static std::shared_ptr<BaseVisitor> create(CallArgs &&...args);
 };
 
-// using RotateVisitorCreator = BaseVisitorCreator<BaseVisitor, RotateVisitor, RotationParams>;
+using RotateVisitorCreator = VisitorCreator<BaseVisitor, RotateVisitor, RotateArgs>;
 
-// using MoveVisitorCreator = BaseVisitorCreator<BaseVisitor, MoveVisitor, MoveParams>;
+using MoveVisitorCreator = VisitorCreator<BaseVisitor, MoveVisitor, MoveArgs>;
 
-// using ScaleVisitorCreator = BaseVisitorCreator<BaseVisitor, ScaleVisitor, ScaleParams>;
+using ScaleVisitorCreator = VisitorCreator<BaseVisitor, ScaleVisitor, ScaleArgs>;
 
-// using DrawVisitorCreator = BaseVisitorCreator<BaseVisitor, DrawVisitor, std::shared_ptr<BaseProjectionStrategy>,
-//                                           std::shared_ptr<BaseRemovingInvisibleLinesStrategy>,
-//                                           std::shared_ptr<BaseCenterStrategy>,
-//                                           std::shared_ptr<BasePainter>, std::shared_ptr<BaseCamera>>;
+using DrawVisitorCreator = VisitorCreator<BaseVisitor, DrawVisitor, 
+    std::shared_ptr<BaseCameraEntity>, 
+    std::shared_ptr<BasePainter>,
+    std::shared_ptr<BaseCenterStrategy>,
+    std::shared_ptr<BaseProjectionStrategy>,
+    std::shared_ptr<BaseRemovingInvisibleLinesStrategy>>;

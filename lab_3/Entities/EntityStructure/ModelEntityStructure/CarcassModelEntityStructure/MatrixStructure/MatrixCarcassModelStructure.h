@@ -18,7 +18,7 @@ public:
     virtual void addVertex(const Vertex& vertex) override;
     virtual void addEdge(const Edge& edge) override;
 
-    virtual void transform() override;
+    virtual void transform(std::shared_ptr<TransformData>) override;
 
     virtual Vertex getCenter() noexcept override;
     virtual std::vector<Vertex> getVertices() const noexcept override;

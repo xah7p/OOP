@@ -2,14 +2,14 @@
 
 #include "BaseManager.h"
 #include "TransformArgs.h"
-#include <cstddef>
+#include "EntityId.h"
 
 class TransformManager : public BaseManager {
 public:
     TransformManager() = default;
     virtual ~TransformManager() = default;
 
-    void moveObject(size_t id, const MoveArgs& args);
-    void scaleObject(size_t id, const ScaleArgs& args);
-    void rotateObject(size_t id, const RotateArgs& args);
+    void moveObject(EntityId id, const MoveArgs& args);
+    void scaleObject(EntityId id, const ScaleArgs& args);
+    void rotateObject(EntityId id, const RotateArgs& args);
 };

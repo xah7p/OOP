@@ -8,3 +8,6 @@ concept NotAbstract = !std::is_abstract_v<Type>;
 
 template<typename Type, typename... Args>
 concept Constructible = std::is_constructible_v<Type, Args...>;
+
+template<typename T, typename U>
+concept Convertible = std::is_convertible_v<T, U>;

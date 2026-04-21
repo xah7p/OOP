@@ -7,12 +7,6 @@
 #include <utility>
 #include "LoadRequest.h"
 #include "ReaderCreator.h"
-#include "TxtCarcassModelReaderImpl.h"
-#include "ObjCarcassModelReaderImpl.h"
-#include "BinCarcassModelReaderImpl.h"
-#include "TxtDefaultCameraReaderImpl.h"
-#include "ObjDefaultCameraReaderImpl.h"
-#include "BinDefaultCameraReaderImpl.h"
 
 class ReaderSolution {
 public: 
