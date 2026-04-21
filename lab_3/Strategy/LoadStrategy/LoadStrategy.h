@@ -18,7 +18,7 @@ public:
 
 class CarcassModelLoadStrategy: public LoadStrategy{
 public:
-    virtual ~CarcassModelLoadStrategy() = default;
+    virtual ~CarcassModelLoadStrategy() override = default;
     virtual std::shared_ptr<BaseEntity> load(
         const LoadRequest& req,
         std::shared_ptr<ReaderSolution> readerSolution,
@@ -28,7 +28,7 @@ public:
 
 class CameraLoadStrategy: public LoadStrategy {
 public:
-    virtual ~CameraLoadStrategy() = default;
+    virtual ~CameraLoadStrategy() override = default;
     virtual std::shared_ptr<BaseEntity> load(
         const LoadRequest& req,
         std::shared_ptr<ReaderSolution> readerSolution,

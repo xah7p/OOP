@@ -3,9 +3,9 @@
 #include "BaseVisitor.h"
 #include "BaseCameraEntity.h"
 #include "BasePainter.h"
-#include "ProjectionStrategy.h"
-#include "CenterStrategy.h"
-#include "RemovingInvisibleLinesStrategy.h"
+#include "BaseProjectionStrategy.h"
+#include "BaseCenterStrategy.h"
+#include "BaseRemovingInvisibleLinesStrategy.h"
 
 class DrawVisitor: public BaseVisitor {
 public:

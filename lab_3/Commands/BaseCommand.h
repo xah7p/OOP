@@ -1,13 +1,10 @@
 #pragma once
 
-#include <memory>
 #include <BaseManager.h>
 
-class Command {
+class BaseCommand {
 public:
-    using ManagerPtr = std::shared_ptr<BaseManager>;
-    using ManagerAction = void(ManagerPtr::*)();
-
-    virtual ~Command() = default;
-    virtual void execute(ManagerPtr, ManagerAction) = 0;
+    BaseCommand() = default;
+    virtual ~BaseCommand() = default;
+    virtual void execute() = 0;
 };
