@@ -6,7 +6,6 @@
 #include "ManagerPool.h"
 #include "SceneManager.h"
 #include "HistoryManager.h"
-#include "BaseCameraEntity.h"
 
 void TransformManager::moveObject(EntityId id, const MoveArgs& args)
 {
@@ -19,7 +18,7 @@ void TransformManager::moveObject(EntityId id, const MoveArgs& args)
         return;
     auto history = std::static_pointer_cast<HistoryManager>(
         ManagerPool::instance()->getManager(ManagerIds::History));
-    const bool isCamera = (std::static_pointer_cast<BaseCameraEntity>(entity) != nullptr);
+    const bool isCamera = !entity->isVisible() && !entity->isComposite();
     if (history && !isCamera)
         history->saveState(id);
     entity->accept(std::make_shared<MoveVisitor>(args));
@@ -38,8 +37,8 @@ void TransformManager::scaleObject(EntityId id, const ScaleArgs& args)
         ManagerPool::instance()->getManager(ManagerIds::History));
     if (history)
         history->saveState(id);
-    auto camera = std::static_pointer_cast<BaseCameraEntity>(entity);
-    if (camera)
+    const bool isCamera = !entity->isVisible() && !entity->isComposite();
+    if (isCamera)
     {
         entity->accept(std::make_shared<ScaleVisitor>(args));
         return;
@@ -63,7 +62,7 @@ void TransformManager::rotateObject(EntityId id, const RotateArgs& args)
         return;
     auto history = std::static_pointer_cast<HistoryManager>(
         ManagerPool::instance()->getManager(ManagerIds::History));
-    const bool isCamera = (std::static_pointer_cast<BaseCameraEntity>(entity) != nullptr);
+    const bool isCamera = !entity->isVisible() && !entity->isComposite();
     if (history && !isCamera)
         history->saveState(id);
     if (isCamera)

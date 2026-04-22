@@ -45,13 +45,12 @@ void LoadManager::loadEntity(EntityId id, const LoadRequest& req)
     if (!readerCreator)
         throw ModelInvalidFileFormat("No reader creator for requested source/type.");
 
-    auto reader = readerCreator->create(req.path);
-    auto sharedReader = std::shared_ptr<BaseReader>(std::move(reader));
+    std::shared_ptr<BaseReader> reader = readerCreator->create(req.path);
     auto directorCreator = directorSolution->create(req.kind);
     if (!directorCreator)
         throw BaseManagerException("No director creator for requested entity kind.");
 
-    auto director = directorCreator->create(sharedReader, req.structure, builderSolution);
+    auto director = directorCreator->create(reader, req.structure, builderSolution);
     auto entity = director->create();
     if (!entity)
         throw BaseManagerException("Director failed to create entity.");

@@ -1,6 +1,6 @@
 #include "Caretaker.h"
 
-void Caretaker::set(EntityId id, unique_ptr<Memento> memento)
+void Caretaker::set(EntityId id, unique_ptr<BaseMemento> memento)
 {
     if (!memento)
         return;
@@ -10,7 +10,7 @@ void Caretaker::set(EntityId id, unique_ptr<Memento> memento)
         mementos.pop_front();
 }
 
-unique_ptr<Memento> Caretaker::get(EntityId id)
+unique_ptr<BaseMemento> Caretaker::get(EntityId id)
 {
     for (auto it = mementos.rbegin(); it != mementos.rend(); ++it)
     {

@@ -1,4 +1,5 @@
 #include "DrawVisitor.h"
+
 DrawVisitor::DrawVisitor(std::shared_ptr<BaseCameraEntity> activeCamera,
                          std::shared_ptr<BasePainter> painter,
                          std::shared_ptr<BaseCenterStrategy> centerStrategy,
@@ -36,12 +37,7 @@ void DrawVisitor::visit(std::shared_ptr<CameraEntityStructure> structure)
     (void)structure;
 }
 
-void DrawVisitor::flush()
-{
-    if (!painter || !removingInvisibleLinesStrategy)
-        return;
-    if (!accumulator)
-        return;
+DrawVisitor::~DrawVisitor() {
     const auto visibleEdges = accumulator->collectVisible(removingInvisibleLinesStrategy, activeCamera);
     for (const auto& edge : visibleEdges)
         painter->drawLine(edge.first, edge.second);

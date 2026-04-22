@@ -9,7 +9,9 @@ class Composite : public BaseEntity {
 private:
     BaseEntityMap entities;
     size_t size = 0;
-public:
+    
+    virtual void assignStateFrom(const BaseEntity& other) override;
+    public:
     Composite() = default;
     Composite(BaseEntityPtr first, ...);
 
@@ -35,6 +37,6 @@ public:
     virtual std::optional<Vertex> getCenter() const override;
     virtual std::shared_ptr<BaseEntity> clone() const override;
 
-    virtual std::unique_ptr<Memento> createMemento() const override;
-    virtual void restoreMemento(std::unique_ptr<Memento>) override;
+    virtual std::unique_ptr<BaseMemento> createMemento() const override;
+    virtual void restoreMemento(std::unique_ptr<BaseMemento>) override;
 };

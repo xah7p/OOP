@@ -22,11 +22,10 @@ public:
     DrawVisitor& operator=(const DrawVisitor& other) = delete;
     DrawVisitor& operator=(DrawVisitor&& other) = default;
 
-    virtual ~DrawVisitor() override = default;
+    virtual ~DrawVisitor() override;
 
     virtual void visit(std::shared_ptr<CarcassModelStructure>) override;
     virtual void visit(std::shared_ptr<CameraEntityStructure>) override;
-    void flush();
 protected:
     std::shared_ptr<BasePainter> painter;
     std::shared_ptr<BaseCameraEntity> activeCamera;

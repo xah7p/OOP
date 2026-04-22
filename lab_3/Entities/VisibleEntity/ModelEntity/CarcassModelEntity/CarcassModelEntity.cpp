@@ -1,4 +1,5 @@
 #include "CarcassModelEntity.h"
+#include "MementoCreator.h"
 
 CarcassModelEntity::CarcassModelEntity(std::shared_ptr<CarcassModelStructure> structure):
     structure(std::move(structure))
@@ -32,22 +33,25 @@ std::shared_ptr<BaseEntity> CarcassModelEntity::clone() const
     return std::make_shared<CarcassModelEntity>(structure->clone());
 }
 
-std::unique_ptr<Memento> CarcassModelEntity::createMemento() const
+void CarcassModelEntity::assignStateFrom(const BaseEntity& other)
 {
-    auto memento = std::make_unique<Memento>();
-    if (structure)
-        memento->set(std::make_unique<CarcassModelEntity>(structure->clone()));
-    return memento;
+    *this = static_cast<const CarcassModelEntity&>(other);
 }
 
-void CarcassModelEntity::restoreMemento(std::unique_ptr<Memento> memento)
+std::unique_ptr<BaseMemento> CarcassModelEntity::createMemento() const
+{
+    if (!structure)
+        return nullptr;
+    return MementoCreator::create<CarcassModelMemento>(*this);
+}
+
+void CarcassModelEntity::restoreMemento(std::unique_ptr<BaseMemento> memento)
 {
     if (!memento)
         return;
-    auto entity = memento->get();
-    auto restored = dynamic_cast<CarcassModelEntity*>(entity.release());
-    if (!restored)
+
+    auto restoredEntity = memento->get();
+    if (!restoredEntity)
         return;
-    structure = restored->structure ? restored->structure->clone() : nullptr;
-    delete restored;
+    assignStateFrom(*restoredEntity);
 }

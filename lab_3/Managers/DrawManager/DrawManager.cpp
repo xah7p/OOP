@@ -38,6 +38,5 @@ void DrawManager::draw()
     if (scene)
     {
         scene->accept(visitor);
-        visitor->flush();
     }
 }

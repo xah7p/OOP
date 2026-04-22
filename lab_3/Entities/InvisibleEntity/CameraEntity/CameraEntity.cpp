@@ -1,4 +1,5 @@
 #include "CameraEntity.h"
+#include "MementoCreator.h"
 
 CameraEntity::CameraEntity(std::shared_ptr<CameraEntityStructure> structure):
     structure(std::move(structure))
@@ -32,22 +33,25 @@ std::shared_ptr<BaseEntity> CameraEntity::clone() const
     return std::make_shared<CameraEntity>(structure->clone());
 }
 
-std::unique_ptr<Memento> CameraEntity::createMemento() const
+void CameraEntity::assignStateFrom(const BaseEntity& other)
 {
-    auto memento = std::make_unique<Memento>();
-    if (structure)
-        memento->set(std::make_unique<CameraEntity>(structure->clone()));
-    return memento;
+    *this = static_cast<const CameraEntity&>(other);
 }
 
-void CameraEntity::restoreMemento(std::unique_ptr<Memento> memento)
+std::unique_ptr<BaseMemento> CameraEntity::createMemento() const
+{
+    if (!structure)
+        return nullptr;
+    return MementoCreator::create<CameraMemento>(*this);
+}
+
+void CameraEntity::restoreMemento(std::unique_ptr<BaseMemento> memento)
 {
     if (!memento)
         return;
-    auto entity = memento->get();
-    auto restored = dynamic_cast<CameraEntity*>(entity.release());
-    if (!restored)
+
+    auto restoredEntity = memento->get();
+    if (!restoredEntity)
         return;
-    structure = restored->structure ? restored->structure->clone() : nullptr;
-    delete restored;
+    assignStateFrom(*restoredEntity);
 }

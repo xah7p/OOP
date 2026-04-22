@@ -23,6 +23,8 @@ public:
     virtual std::optional<Vertex> getCenter() const override;
     virtual std::shared_ptr<BaseEntity> clone() const override;
 
-    virtual std::unique_ptr<Memento> createMemento() const override;
-    virtual void restoreMemento(std::unique_ptr<Memento>) override;
+    virtual void assignStateFrom(const BaseEntity& other) override;
+
+    virtual std::unique_ptr<BaseMemento> createMemento() const override;
+    virtual void restoreMemento(std::unique_ptr<BaseMemento>) override;
 };

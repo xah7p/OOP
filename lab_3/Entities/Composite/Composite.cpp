@@ -1,4 +1,5 @@
 #include "Composite.h"
+#include "MementoCreator.h"
 
 #include <cstdarg>
 
@@ -132,22 +133,42 @@ std::shared_ptr<BaseEntity> Composite::clone() const
     return std::make_shared<Composite>(*this);
 }
 
-std::unique_ptr<Memento> Composite::createMemento() const
+std::unique_ptr<BaseMemento> Composite::createMemento() const
 {
-    auto memento = std::make_unique<Memento>();
-    memento->set(std::make_unique<Composite>(*this));
-    return memento;
+    return MementoCreator::create<CompositeMemento>(*this);
 }
 
-void Composite::restoreMemento(std::unique_ptr<Memento> memento)
+void Composite::assignStateFrom(const BaseEntity& other)
+{
+    const Composite& snapshot = static_cast<const Composite&>(other);
+    if (size != snapshot.size)
+    {
+        *this = snapshot;
+        return;
+    }
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (!entities.contains(i) || !snapshot.entities.contains(i))
+        {
+            *this = snapshot;
+            return;
+        }
+        BaseEntityPtr live = entities[i];
+        BaseEntityPtr snap = snapshot.entities.at(i);
+        if (!live || !snap)
+            continue;
+        live->assignStateFrom(*snap);
+    }
+}
+
+void Composite::restoreMemento(std::unique_ptr<BaseMemento> memento)
 {
     if (!memento)
         return;
-    auto restored = memento->get();
-    auto composite = dynamic_cast<Composite*>(restored.release());
-    if (!composite)
+
+    auto restoredEntity = memento->get();
+    if (!restoredEntity)
         return;
-    entities = std::move(composite->entities);
-    size = composite->size;
-    delete composite;
+    assignStateFrom(*restoredEntity);
 }
+

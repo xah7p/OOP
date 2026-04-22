@@ -39,6 +39,8 @@ public:
     virtual void accept(std::shared_ptr<BaseVisitor>) = 0;
     virtual std::shared_ptr<BaseEntity> clone() const = 0;
 
-    virtual std::unique_ptr<Memento> createMemento() const = 0;
-    virtual void restoreMemento(std::unique_ptr<Memento>) = 0;
+    virtual void assignStateFrom(const BaseEntity& other) = 0;
+
+    virtual std::unique_ptr<BaseMemento> createMemento() const = 0;
+    virtual void restoreMemento(std::unique_ptr<BaseMemento>) = 0;
 };
