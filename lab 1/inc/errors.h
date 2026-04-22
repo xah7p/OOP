@@ -1,0 +1,25 @@
+#ifndef ERRORS_H
+#define ERRORS_H
+
+#include "common.h"
+
+typedef enum
+{
+    SUCCESS,
+    INVALID_ARG,
+    INVALID_POINT_INPUT,
+    INVALID_POINT_ARR_SIZE,
+    INVALID_LINE_INPUT,
+    INVALID_LINE_ARR_SIZE,
+    INVALID_LINES_INDEXES,
+    LINE_ARR_NOT_ALLOCATED,
+    POINT_ARR_NOT_ALLOCATED,
+    FILE_NOT_OPENED,
+    DIV_BY_ZERO,
+    UNKNOWN_ACTION,
+    UNKNOWN_TRANSFORM
+} ErrorCode;
+
+void ErrorPrint(const ErrorCode code);
+
+#endif
