@@ -20,5 +20,6 @@ public:
     void transform(std::shared_ptr<TransformData>) override;
     void accept(std::shared_ptr<BaseVisitor> visitor) override;
     Vertex getViewpoint() const noexcept override;
+    std::shared_ptr<CameraEntityStructure> clone() const override;
 };
 

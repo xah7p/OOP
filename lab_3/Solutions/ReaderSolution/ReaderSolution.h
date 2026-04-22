@@ -11,12 +11,13 @@
 class ReaderSolution {
 public: 
     using CreateCreator = std::unique_ptr<BaseReaderCreator>(*)();
-    using CallBackMap = std::map<size_t, CreateCreator>;
+    using Key = std::pair<std::string, EntityKind>;
+    using CallBackMap = std::map<Key, CreateCreator>;
 private:
     CallBackMap callbacks;
 public:
     ReaderSolution() = default;
-    ReaderSolution(std::initializer_list<std::pair<size_t, CreateCreator>>);
+    ReaderSolution(std::initializer_list<std::pair<Key, CreateCreator>>);
     ~ReaderSolution() = default;
 
     bool registrate(const std::string& path, EntityKind kind, CreateCreator createfun);

@@ -40,3 +40,12 @@ class BinDefaultCameraReaderCreator: public BaseReaderCreator {
 public:
     std::unique_ptr<BaseReader> create(const std::string& path) const override;
 };
+
+class ReaderCreatorMaker {
+public:
+    template <typename TCreator>
+    static std::unique_ptr<BaseReaderCreator> createCreator()
+    {
+        return std::make_unique<TCreator>();
+    }
+};

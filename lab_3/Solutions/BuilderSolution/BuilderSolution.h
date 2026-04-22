@@ -2,26 +2,20 @@
 
 #include "LoadRequest.h"
 #include "BuilderCreator.h"
-#include "BaseBuilder.h"
-#include "BaseReader.h"
-#include "CarcassModelReader.h"
-#include "DefaultCameraReader.h"
-#include "CarcassModelStructure.h"
 
-#include <initializer_list>
-#include <cstddef>
 #include <map>
 #include <memory>
 #include <utility>
 
 class BuilderSolution {
-private:
+public:
+    using Key = std::pair<EntityKind, EntityStructureKind>;
     using CreateCreator = std::unique_ptr<BaseBuilderCreator>(*)();
-    using CallBackMap = std::map<size_t, CreateCreator>;
+    using CallBackMap = std::map<Key, CreateCreator>;
+private:
     CallBackMap callbacks;
 public:
     BuilderSolution() = default;
-    BuilderSolution(std::initializer_list<std::pair<size_t, CreateCreator>>);
     ~BuilderSolution() = default;
 
     bool registrate(EntityKind kind, EntityStructureKind structureKind, CreateCreator createfun);

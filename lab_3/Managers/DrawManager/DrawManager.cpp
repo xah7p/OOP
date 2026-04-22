@@ -18,9 +18,9 @@ void DrawManager::draw()
     if (!painter)
         return;
 
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
         ManagerPool::instance()->getManager(ManagerIds::Scene));
-    auto cameraManager = std::dynamic_pointer_cast<CameraManager>(
+    auto cameraManager = std::static_pointer_cast<CameraManager>(
         ManagerPool::instance()->getManager(ManagerIds::Camera));
     if (!sceneManager)
         return;
@@ -36,5 +36,8 @@ void DrawManager::draw()
 
     auto scene = sceneManager->getScene();
     if (scene)
+    {
         scene->accept(visitor);
+        visitor->flush();
+    }
 }

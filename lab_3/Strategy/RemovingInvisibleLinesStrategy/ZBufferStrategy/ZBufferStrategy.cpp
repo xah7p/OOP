@@ -6,16 +6,14 @@
 #include <set>
 #include <vector>
 
-namespace
-{
-bool edgeExists(const std::vector<std::vector<size_t>>& adj, size_t a, size_t b)
+bool ZBufferStrategy::edgeExists(const std::vector<std::vector<size_t>>& adj, size_t a, size_t b)
 {
     if (a >= adj.size())
         return false;
     return std::binary_search(adj[a].begin(), adj[a].end(), b);
 }
 
-std::vector<std::array<size_t, 4>> findQuadFaces(const std::vector<Edge>& edges, size_t vertexCount)
+std::vector<std::array<size_t, 4>> ZBufferStrategy::findQuadFaces(const std::vector<Edge>& edges, size_t vertexCount)
 {
     std::vector<std::vector<size_t>> adj(vertexCount);
     for (const auto& edge : edges)
@@ -49,7 +47,7 @@ std::vector<std::array<size_t, 4>> findQuadFaces(const std::vector<Edge>& edges,
             {
                 if (d == a || d == b)
                     continue;
-                if (!edgeExists(adj, d, a))
+                if (!ZBufferStrategy::edgeExists(adj, d, a))
                     continue;
 
                 std::array<size_t, 4> ordered = {a, b, c, d};
@@ -65,8 +63,8 @@ std::vector<std::array<size_t, 4>> findQuadFaces(const std::vector<Edge>& edges,
     return faces;
 }
 
-bool pointInTriangle(double px, double py, const Vertex& a, const Vertex& b, const Vertex& c,
-                     double& wa, double& wb, double& wc)
+bool ZBufferStrategy::pointInTriangle(double px, double py, const Vertex& a, const Vertex& b, const Vertex& c,
+                                      double& wa, double& wb, double& wc)
 {
     const double v0x = b.getX() - a.getX();
     const double v0y = b.getY() - a.getY();
@@ -86,15 +84,13 @@ bool pointInTriangle(double px, double py, const Vertex& a, const Vertex& b, con
     return wa >= eps && wb >= eps && wc >= eps;
 }
 
-void appendVisibleRun(std::vector<ZBufferStrategy::Edge2D>& visibleEdges, const std::vector<Vertex>& run)
+void ZBufferStrategy::appendVisibleRun(std::vector<Edge2D>& visibleEdges, const std::vector<Vertex>& run)
 {
     if (run.size() < 2)
         return;
     for (size_t i = 1; i < run.size(); ++i)
         visibleEdges.emplace_back(run[i - 1], run[i]);
 }
-
-}  
 
 void ZBufferStrategy::prepare(std::vector<Edge2D>& visibleEdges,
                               const std::vector<Vertex>& vertices,
@@ -104,17 +100,10 @@ void ZBufferStrategy::prepare(std::vector<Edge2D>& visibleEdges,
     (void)camera;
     visibleEdges.clear();
 
-    struct Triangle
-    {
-        Vertex a;
-        Vertex b;
-        Vertex c;
-    };
-
     std::vector<Triangle> triangles;
     triangles.reserve(edges.size());
 
-    const auto faces = findQuadFaces(edges, vertices.size());
+    const auto faces = ZBufferStrategy::findQuadFaces(edges, vertices.size());
     if (faces.empty())
     {
         for (const auto& edge : edges)
@@ -186,7 +175,7 @@ void ZBufferStrategy::prepare(std::vector<Edge2D>& visibleEdges,
             const double z = v1.getZ() + (v2.getZ() - v1.getZ()) * t;
             if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z))
             {
-                appendVisibleRun(visibleEdges, run);
+                ZBufferStrategy::appendVisibleRun(visibleEdges, run);
                 run.clear();
                 continue;
             }
@@ -195,7 +184,7 @@ void ZBufferStrategy::prepare(std::vector<Edge2D>& visibleEdges,
             for (const auto& tri : triangles)
             {
                 double wa = 0.0, wb = 0.0, wc = 0.0;
-                if (!pointInTriangle(x, y, tri.a, tri.b, tri.c, wa, wb, wc))
+                if (!ZBufferStrategy::pointInTriangle(x, y, tri.a, tri.b, tri.c, wa, wb, wc))
                     continue;
                 const double zFace = wa * tri.a.getZ() + wb * tri.b.getZ() + wc * tri.c.getZ();
                 if (zFace < z - eps)
@@ -209,10 +198,10 @@ void ZBufferStrategy::prepare(std::vector<Edge2D>& visibleEdges,
                 run.emplace_back(x, y, z);
             else
             {
-                appendVisibleRun(visibleEdges, run);
+                ZBufferStrategy::appendVisibleRun(visibleEdges, run);
                 run.clear();
             }
         }
-        appendVisibleRun(visibleEdges, run);
+        ZBufferStrategy::appendVisibleRun(visibleEdges, run);
     }
 }

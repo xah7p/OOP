@@ -4,7 +4,7 @@
 
 SceneClearCommand::SceneClearCommand():
     method(&SceneManager::clear),
-    manager(std::dynamic_pointer_cast<SceneManager>(ManagerPool::instance()->getManager(ManagerIds::Scene)))
+    manager(std::static_pointer_cast<SceneManager>(ManagerPool::instance()->getManager(ManagerIds::Scene)))
 { }
 
 void SceneClearCommand::execute()

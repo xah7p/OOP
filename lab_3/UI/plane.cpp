@@ -1,9 +1,8 @@
 #include "plane.h"
 
-#include "CameraManager.h"
 #include "EntityRotateCommand.h"
+#include "CameraGetActiveIdCommand.h"
 #include "DrawCommand.h"
-#include "ManagerPool.h"
 
 #include <QMouseEvent>
 #include <algorithm>
@@ -61,15 +60,12 @@ void Plane::mouseMoveEvent(QMouseEvent *event)
                     -static_cast<double>(dx) * sensitivity,
                     0.0, 0.0, 0.0, 0.0);
 
-    auto cameraManager = std::dynamic_pointer_cast<CameraManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Camera));
-    if (cameraManager)
-    {
-        auto command = std::make_shared<EntityRotateCommand>(cameraManager->getActiveCameraId(), args);
-        Facade::instance()->execute(command);
-        Facade::instance()->execute(std::make_shared<DrawCommand>());
-        drawTimer.restart();
-    }
+    EntityId activeCameraId = 0;
+    Facade::instance()->execute(std::make_shared<CameraGetActiveIdCommand>(activeCameraId));
+    auto command = std::make_shared<EntityRotateCommand>(activeCameraId, args);
+    Facade::instance()->execute(command);
+    Facade::instance()->execute(std::make_shared<DrawCommand>());
+    drawTimer.restart();
 
     pressStarted = event->pos();
 }

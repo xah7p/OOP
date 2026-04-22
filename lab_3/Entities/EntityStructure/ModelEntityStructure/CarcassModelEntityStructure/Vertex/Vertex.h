@@ -5,25 +5,21 @@
 #include <compare>
 #include <ostream>
 #include <memory>
+#include "BaseVertexStructure.h"
 
-class TransformState;
-
-class Vertex final {
+class Vertex final { // разное представление точки
 private:
-    double x;
-    double y;
-    double z;
-    double w;
+    std::shared_ptr<BaseVertexStructure> structure;
 public:
-    Vertex() noexcept = default;
+    Vertex() noexcept;
     Vertex(double x, double y, double z) noexcept;
 
-    Vertex(const Vertex& other) noexcept = default;
+    Vertex(const Vertex& other) noexcept;
     Vertex(Vertex&& other) noexcept = default;
 
     ~Vertex() noexcept = default;
     
-    Vertex& operator=(const Vertex& other) noexcept = default;
+    Vertex& operator=(const Vertex& other) noexcept;
     Vertex& operator=(Vertex&& other) noexcept = default;
 
     double getX() const noexcept;
@@ -36,7 +32,8 @@ public:
     void setZ(double value) noexcept;
     void setW(double value) noexcept;
 
-    std::partial_ordering operator<=>(const Vertex& other) const noexcept = default;
+    std::partial_ordering operator<=>(const Vertex& other) const noexcept;
+    bool operator==(const Vertex& other) const noexcept;
     bool equal(const Vertex& other) const noexcept;
     bool notEqual(const Vertex& other) const noexcept;
     bool lessEqual(const Vertex& other) const noexcept;

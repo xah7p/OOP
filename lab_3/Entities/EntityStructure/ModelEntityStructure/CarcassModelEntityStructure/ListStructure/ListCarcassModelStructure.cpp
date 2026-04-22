@@ -36,3 +36,8 @@ std::vector<Edge> ListCarcassModelStructure::getEdges() const noexcept
 {
     return edges;
 }
+
+std::shared_ptr<CarcassModelStructure> ListCarcassModelStructure::clone() const
+{
+    return std::make_shared<ListCarcassModelStructure>(*this);
+}

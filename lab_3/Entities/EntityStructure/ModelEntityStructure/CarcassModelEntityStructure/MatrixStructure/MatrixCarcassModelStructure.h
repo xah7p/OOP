@@ -23,4 +23,5 @@ public:
     virtual Vertex getCenter() noexcept override;
     virtual std::vector<Vertex> getVertices() const noexcept override;
     virtual std::vector<Edge> getEdges() const noexcept override;
+    virtual std::shared_ptr<CarcassModelStructure> clone() const override;
 };

@@ -7,7 +7,10 @@
 class CarcassDirector: public ModelDirector {
 public:
     CarcassDirector() = delete;
-    explicit CarcassDirector(std::shared_ptr<BaseBuilder> builder);
+    CarcassDirector(
+        const std::shared_ptr<BaseReader>& reader,
+        EntityStructureKind structureKind,
+        std::shared_ptr<BuilderSolution> builderSolution);
 
     ~CarcassDirector() override = default;
 

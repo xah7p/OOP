@@ -1,52 +1,6 @@
 #include "Composite.h"
-#include "CarcassModelEntity.h"
-#include "CameraEntity.h"
-#include "ListCarcassModelStructure.h"
-#include "MatrixCarcassModelStructure.h"
-#include "DefaultCameraEntityStructure.h"
 
 #include <cstdarg>
-
-namespace
-{
-std::shared_ptr<BaseEntity> cloneEntity(const std::shared_ptr<BaseEntity>& source)
-{
-    if (!source)
-        return nullptr;
-
-    if (auto model = std::dynamic_pointer_cast<CarcassModelEntity>(source))
-    {
-        auto structure = model->getStructure();
-        if (auto list = std::dynamic_pointer_cast<ListCarcassModelStructure>(structure))
-            return std::make_shared<CarcassModelEntity>(std::make_shared<ListCarcassModelStructure>(*list));
-        if (auto matrix = std::dynamic_pointer_cast<MatrixCarcassModelStructure>(structure))
-            return std::make_shared<CarcassModelEntity>(std::make_shared<MatrixCarcassModelStructure>(*matrix));
-        return nullptr;
-    }
-
-    if (auto camera = std::dynamic_pointer_cast<CameraEntity>(source))
-    {
-        auto structure = camera->getStructure();
-        if (auto def = std::dynamic_pointer_cast<DefaultCameraEntityStructure>(structure))
-            return std::make_shared<CameraEntity>(std::make_shared<DefaultCameraEntityStructure>(*def));
-        return nullptr;
-    }
-
-    if (auto composite = std::dynamic_pointer_cast<Composite>(source))
-    {
-        auto out = std::make_shared<Composite>();
-        for (auto it = composite->cbegin(); it != composite->cend(); ++it)
-        {
-            auto child = cloneEntity(it->second);
-            if (child)
-                out->add({child});
-        }
-        return out;
-    }
-
-    return nullptr;
-}
-}  
 
 Composite::Composite(BaseEntityPtr first, ...)
 {
@@ -69,7 +23,7 @@ Composite::Composite(const Composite& other):
 {
     for (const auto& item : other.entities)
     {
-        auto cloned = cloneEntity(item.second);
+        auto cloned = item.second ? item.second->clone() : nullptr;
         if (cloned)
             entities[size++] = cloned;
     }
@@ -89,7 +43,7 @@ Composite& Composite::operator=(const Composite& other)
         size = 0;
         for (const auto& item : other.entities)
         {
-            auto cloned = cloneEntity(item.second);
+            auto cloned = item.second ? item.second->clone() : nullptr;
             if (cloned)
                 entities[size++] = cloned;
         }
@@ -153,11 +107,35 @@ void Composite::accept(std::shared_ptr<BaseVisitor> visitor)
         item.second->accept(visitor);
 }
 
+std::optional<Vertex> Composite::getCenter() const
+{
+    Vertex sum(0.0, 0.0, 0.0);
+    size_t count = 0;
+    for (auto it = entities.cbegin(); it != entities.cend(); ++it)
+    {
+        auto center = it->second ? it->second->getCenter() : std::nullopt;
+        if (!center)
+            continue;
+        sum += *center;
+        ++count;
+    }
+    if (count == 0)
+        return std::nullopt;
+    sum.setX(sum.getX() / static_cast<double>(count));
+    sum.setY(sum.getY() / static_cast<double>(count));
+    sum.setZ(sum.getZ() / static_cast<double>(count));
+    return sum;
+}
+
+std::shared_ptr<BaseEntity> Composite::clone() const
+{
+    return std::make_shared<Composite>(*this);
+}
+
 std::unique_ptr<Memento> Composite::createMemento() const
 {
     auto memento = std::make_unique<Memento>();
-    auto cloned = std::make_unique<Composite>(*this);
-    memento->set(std::move(cloned));
+    memento->set(std::make_unique<Composite>(*this));
     return memento;
 }
 

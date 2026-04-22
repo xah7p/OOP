@@ -2,6 +2,10 @@
 
 #include "ManagerPoolReader.h"
 #include "BaseCommand.h"
+#include "BaseGraphicsScene.h"
+#include "BasePainter.h"
+#include <cstddef>
+#include <memory>
 
 class Facade {
 private:
@@ -14,4 +18,7 @@ public:
         return myInstance;
     }
     void execute(std::shared_ptr<BaseCommand> command);
+    
+    std::shared_ptr<BaseGraphicsScene> createGraphicsScene(size_t width, size_t height);
+    std::shared_ptr<BasePainter> createPainter(const std::shared_ptr<BaseGraphicsScene>& scene);
 };

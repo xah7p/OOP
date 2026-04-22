@@ -1,19 +1,4 @@
 #include "CameraEntity.h"
-#include "DefaultCameraEntityStructure.h"
-
-namespace
-{
-std::shared_ptr<CameraEntityStructure> cloneStructure(const std::shared_ptr<CameraEntityStructure>& source)
-{
-    if (!source)
-        return nullptr;
-
-    if (auto camera = std::dynamic_pointer_cast<DefaultCameraEntityStructure>(source))
-        return std::make_shared<DefaultCameraEntityStructure>(*camera);
-
-    return nullptr;
-}
-}  
 
 CameraEntity::CameraEntity(std::shared_ptr<CameraEntityStructure> structure):
     structure(std::move(structure))
@@ -30,17 +15,28 @@ void CameraEntity::accept(std::shared_ptr<BaseVisitor> visitor)
         visitor->visit(structure);
 }
 
-std::shared_ptr<CameraEntityStructure> CameraEntity::getStructure() const noexcept
+std::shared_ptr<CameraEntityStructure> CameraEntity::accept() const
 {
     return structure;
+}
+
+std::optional<Vertex> CameraEntity::getCenter() const
+{
+    return structure ? std::optional<Vertex>(structure->getViewpoint()) : std::nullopt;
+}
+
+std::shared_ptr<BaseEntity> CameraEntity::clone() const
+{
+    if (!structure)
+        return std::make_shared<CameraEntity>(nullptr);
+    return std::make_shared<CameraEntity>(structure->clone());
 }
 
 std::unique_ptr<Memento> CameraEntity::createMemento() const
 {
     auto memento = std::make_unique<Memento>();
-    auto clonedStructure = cloneStructure(structure);
-    if (clonedStructure)
-        memento->set(std::make_unique<CameraEntity>(clonedStructure));
+    if (structure)
+        memento->set(std::make_unique<CameraEntity>(structure->clone()));
     return memento;
 }
 
@@ -52,6 +48,6 @@ void CameraEntity::restoreMemento(std::unique_ptr<Memento> memento)
     auto restored = dynamic_cast<CameraEntity*>(entity.release());
     if (!restored)
         return;
-    structure = cloneStructure(restored->structure);
+    structure = restored->structure ? restored->structure->clone() : nullptr;
     delete restored;
 }

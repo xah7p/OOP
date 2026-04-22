@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "Scene.h"
 #include "BaseManager.h"
 #include "BaseEntity.h"
@@ -19,6 +20,7 @@ public:
     std::shared_ptr<BaseEntity> getEntity(EntityId id);
     [[nodiscard]] bool addEntity(std::shared_ptr<BaseEntity>);
     [[nodiscard]] bool removeEntity(EntityId id);
+    bool createComposite(const std::vector<EntityId>& ids);
 
     void clear();
 };

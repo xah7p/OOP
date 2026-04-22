@@ -5,7 +5,7 @@
 CameraAddCommand::CameraAddCommand(const EntityId& id):
     cameraId(id),
     method(&CameraManager::addCamera),
-    manager(std::dynamic_pointer_cast<CameraManager>(ManagerPool::instance()->getManager(ManagerIds::Camera)))
+    manager(std::static_pointer_cast<CameraManager>(ManagerPool::instance()->getManager(ManagerIds::Camera)))
 { }
 
 void CameraAddCommand::execute()

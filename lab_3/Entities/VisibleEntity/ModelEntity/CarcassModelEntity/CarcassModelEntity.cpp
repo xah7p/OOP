@@ -1,22 +1,4 @@
 #include "CarcassModelEntity.h"
-#include "ListCarcassModelStructure.h"
-#include "MatrixCarcassModelStructure.h"
-
-namespace
-{
-std::shared_ptr<CarcassModelStructure> cloneStructure(const std::shared_ptr<CarcassModelStructure>& source)
-{
-    if (!source)
-        return nullptr;
-
-    if (auto list = std::dynamic_pointer_cast<ListCarcassModelStructure>(source))
-        return std::make_shared<ListCarcassModelStructure>(*list);
-    if (auto matrix = std::dynamic_pointer_cast<MatrixCarcassModelStructure>(source))
-        return std::make_shared<MatrixCarcassModelStructure>(*matrix);
-
-    return nullptr;
-}
-}  
 
 CarcassModelEntity::CarcassModelEntity(std::shared_ptr<CarcassModelStructure> structure):
     structure(std::move(structure))
@@ -33,17 +15,28 @@ void CarcassModelEntity::accept(std::shared_ptr<BaseVisitor> visitor)
         visitor->visit(structure);
 }
 
-std::shared_ptr<CarcassModelStructure> CarcassModelEntity::getStructure() const noexcept
+std::shared_ptr<CarcassModelStructure> CarcassModelEntity::accept() const
 {
     return structure;
+}
+
+std::optional<Vertex> CarcassModelEntity::getCenter() const
+{
+    return structure ? std::optional<Vertex>(structure->getCenter()) : std::nullopt;
+}
+
+std::shared_ptr<BaseEntity> CarcassModelEntity::clone() const
+{
+    if (!structure)
+        return std::make_shared<CarcassModelEntity>(nullptr);
+    return std::make_shared<CarcassModelEntity>(structure->clone());
 }
 
 std::unique_ptr<Memento> CarcassModelEntity::createMemento() const
 {
     auto memento = std::make_unique<Memento>();
-    auto clonedStructure = cloneStructure(structure);
-    if (clonedStructure)
-        memento->set(std::make_unique<CarcassModelEntity>(clonedStructure));
+    if (structure)
+        memento->set(std::make_unique<CarcassModelEntity>(structure->clone()));
     return memento;
 }
 
@@ -55,6 +48,6 @@ void CarcassModelEntity::restoreMemento(std::unique_ptr<Memento> memento)
     auto restored = dynamic_cast<CarcassModelEntity*>(entity.release());
     if (!restored)
         return;
-    structure = cloneStructure(restored->structure);
+    structure = restored->structure ? restored->structure->clone() : nullptr;
     delete restored;
 }

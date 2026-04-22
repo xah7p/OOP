@@ -63,3 +63,8 @@ Vertex DefaultCameraEntityStructure::getViewpoint() const noexcept
 {
     return viewpoint;
 }
+
+std::shared_ptr<CameraEntityStructure> DefaultCameraEntityStructure::clone() const
+{
+    return std::make_shared<DefaultCameraEntityStructure>(*this);
+}

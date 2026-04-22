@@ -6,20 +6,12 @@
 #include "ManagerPool.h"
 #include "CameraManagerException.h"
 
-namespace
-{
-std::shared_ptr<SceneManager> getSceneManager()
-{
-    auto manager = ManagerPool::instance()->getManager(ManagerIds::Scene);
-    return std::dynamic_pointer_cast<SceneManager>(manager);
-}
-}  
-
 CameraManager::CameraManager() = default;
 
 void CameraManager::addCamera(const EntityId& id)
 {
-    auto sceneManager = getSceneManager();
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
+        ManagerPool::instance()->getManager(ManagerIds::Scene));
     if (!sceneManager)
         return;
 
@@ -33,7 +25,8 @@ void CameraManager::addCamera(const EntityId& id)
 
 void CameraManager::removeCamera(const EntityId& id)
 {
-    auto sceneManager = getSceneManager();
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
+        ManagerPool::instance()->getManager(ManagerIds::Scene));
     if (!sceneManager)
         return;
 
@@ -46,12 +39,13 @@ void CameraManager::removeCamera(const EntityId& id)
 
 void CameraManager::setActiveCamera(const EntityId& id)
 {
-    auto sceneManager = getSceneManager();
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
+        ManagerPool::instance()->getManager(ManagerIds::Scene));
     if (!sceneManager)
         throw CameraManagerException("Scene manager is not available.");
 
     auto entity = sceneManager->getEntity(id);
-    auto camera = std::dynamic_pointer_cast<BaseCameraEntity>(entity);
+    auto camera = std::static_pointer_cast<BaseCameraEntity>(entity);
     if (!camera)
         throw CameraManagerInvalidIdException("Invalid camera id.");
 

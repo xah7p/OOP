@@ -5,14 +5,12 @@
 #include <QMainWindow>
 
 class QComboBox;
-class QGraphicsScene;
 class QLineEdit;
 class QListWidget;
 class QPushButton;
 class QTableWidget;
 class QTabWidget;
 class Plane;
-class Vertex;
 
 class MainWindow: public QMainWindow
 {
@@ -37,10 +35,9 @@ private:
 private:
     void createUi();
     void createScene();
+    QLineEdit *makeEdit(QWidget *parent, const QString &placeholder) const;
     void insertRow(EntityId id, const QString &name, const QString &type);
     std::vector<int> selectedRows() const;
-    void updateRowCenter(int row);
-    void updateCentersForRows(const std::vector<int> &rows);
     void logOperation(const QString &text);
 
     Plane *planeWidget = nullptr;
@@ -65,7 +62,6 @@ private:
     QTableWidget *tableWidget = nullptr;
     QListWidget *operationsList = nullptr;
 
-    std::shared_ptr<QGraphicsScene> scene;
     EntityId objects = 0;
     EntityId activeCamId = 0;
 };

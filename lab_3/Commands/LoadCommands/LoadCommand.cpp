@@ -6,7 +6,7 @@ LoadCommand::LoadCommand(EntityId id, const LoadRequest& req):
     entityId(id),
     req(req),
     method(&LoadManager::loadEntity),
-    manager(std::dynamic_pointer_cast<LoadManager>(ManagerPool::instance()->getManager(ManagerIds::Load)))
+    manager(std::static_pointer_cast<LoadManager>(ManagerPool::instance()->getManager(ManagerIds::Load)))
 { }
 
 void LoadCommand::execute()

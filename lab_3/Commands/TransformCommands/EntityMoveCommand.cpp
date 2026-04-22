@@ -6,7 +6,7 @@ EntityMoveCommand::EntityMoveCommand(EntityId id, const MoveArgs& args):
     entityId(id),
     args(args),
     method(&TransformManager::moveObject),
-    manager(std::dynamic_pointer_cast<TransformManager>(ManagerPool::instance()->getManager(ManagerIds::Transform)))
+    manager(std::static_pointer_cast<TransformManager>(ManagerPool::instance()->getManager(ManagerIds::Transform)))
 { }
 
 void EntityMoveCommand::execute()

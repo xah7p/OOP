@@ -2,14 +2,18 @@
 
 #include "BaseCameraBuilder.h"
 
-CameraDirector::CameraDirector(std::shared_ptr<BaseBuilder> builder)
+CameraDirector::CameraDirector(
+    const std::shared_ptr<BaseReader>& reader,
+    EntityStructureKind structureKind,
+    std::shared_ptr<BuilderSolution> builderSolution):
+    BaseDirector(std::move(builderSolution))
 {
-    this->builder = std::move(builder);
+    builder = createBuilder(reader, EntityKind::Camera, structureKind);
 }
 
 std::shared_ptr<BaseEntity> CameraDirector::create() const
 {
-    auto cameraBuilder = std::dynamic_pointer_cast<BaseCameraBuilder>(builder);
+    auto cameraBuilder = std::static_pointer_cast<BaseCameraBuilder>(builder);
     if (!cameraBuilder)
         return nullptr;
 

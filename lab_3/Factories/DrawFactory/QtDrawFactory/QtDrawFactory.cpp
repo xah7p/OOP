@@ -1,12 +1,14 @@
 #include "QtDrawFactory.h"
 
+#include "QtGraphicsScene.h"
 #include "QtPainter.h"
 
-QtDrawFactory::QtDrawFactory(std::shared_ptr<QGraphicsScene> scene):
-    scene(std::move(scene))
-{ }
-
-std::shared_ptr<BasePainter> QtDrawFactory::createPainter()
+std::shared_ptr<BaseGraphicsScene> QtDrawFactory::createGraphicsScene(size_t width, size_t height)
 {
-    return std::make_shared<QtPainter>(scene);
+    return std::make_shared<QtGraphicsScene>(width, height);
+}
+
+std::shared_ptr<BasePainter> QtDrawFactory::createPainter(std::shared_ptr<BaseGraphicsScene> scene)
+{
+    return std::make_shared<QtPainter>(std::move(scene));
 }

@@ -5,7 +5,7 @@
 
 class CarcassModelEntity: public BaseModelEntity {
 private:
-    std::shared_ptr<CarcassModelStructure> structure; 
+    std::shared_ptr<CarcassModelStructure> structure;
 public:
     CarcassModelEntity() = default;
     CarcassModelEntity(std::shared_ptr<CarcassModelStructure>);
@@ -19,7 +19,9 @@ public:
     virtual ~CarcassModelEntity() override = default;
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
-    std::shared_ptr<CarcassModelStructure> getStructure() const noexcept;
+    virtual std::shared_ptr<CarcassModelStructure> accept() const override;
+    virtual std::optional<Vertex> getCenter() const override;
+    virtual std::shared_ptr<BaseEntity> clone() const override;
 
     virtual std::unique_ptr<Memento> createMemento() const override;
     virtual void restoreMemento(std::unique_ptr<Memento>) override;

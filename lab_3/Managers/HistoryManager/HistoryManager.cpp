@@ -9,7 +9,7 @@ HistoryManager::HistoryManager():
 
 void HistoryManager::saveState(EntityId id)
 {
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
         ManagerPool::instance()->getManager(ManagerIds::Scene));
     if (!sceneManager)
         return;
@@ -21,7 +21,7 @@ void HistoryManager::saveState(EntityId id)
 
 void HistoryManager::restoreState(EntityId id)
 {
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
+    auto sceneManager = std::static_pointer_cast<SceneManager>(
         ManagerPool::instance()->getManager(ManagerIds::Scene));
     if (!sceneManager)
         return;

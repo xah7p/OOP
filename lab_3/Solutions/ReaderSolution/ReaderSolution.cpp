@@ -2,15 +2,7 @@
 
 #include <filesystem>
 
-namespace
-{
-size_t makeKey(const std::string& extension, EntityKind kind)
-{
-    return (std::hash<std::string>{}(extension) << 1U) ^ static_cast<size_t>(kind);
-}
-}  
-
-ReaderSolution::ReaderSolution(std::initializer_list<std::pair<size_t, CreateCreator>> list):
+ReaderSolution::ReaderSolution(std::initializer_list<std::pair<Key, CreateCreator>> list):
     callbacks()
 {
     for (const auto& item : list)
@@ -19,7 +11,7 @@ ReaderSolution::ReaderSolution(std::initializer_list<std::pair<size_t, CreateCre
 
 bool ReaderSolution::registrate(const std::string& path, EntityKind kind, CreateCreator createfun)
 {
-    const auto key = makeKey(path, kind);
+    const Key key = {path, kind};
     if (!createfun || callbacks.contains(key))
         return false;
     callbacks[key] = createfun;
@@ -31,7 +23,7 @@ std::unique_ptr<BaseReaderCreator> ReaderSolution::create(const std::string& pat
     auto extension = std::filesystem::path(path).extension().string();
     if (!extension.empty() && extension.front() == '.')
         extension = extension.substr(1);
-    const auto key = makeKey(extension, kind);
+    const Key key = {extension, kind};
     if (!callbacks.contains(key))
         return nullptr;
     return callbacks.at(key)();

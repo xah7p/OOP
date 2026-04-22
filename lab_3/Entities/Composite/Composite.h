@@ -32,6 +32,8 @@ public:
     virtual const_iterator cend() const override;
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
+    virtual std::optional<Vertex> getCenter() const override;
+    virtual std::shared_ptr<BaseEntity> clone() const override;
 
     virtual std::unique_ptr<Memento> createMemento() const override;
     virtual void restoreMemento(std::unique_ptr<Memento>) override;

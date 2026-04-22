@@ -52,3 +52,8 @@ std::vector<Edge> MatrixCarcassModelStructure::getEdges() const noexcept
     }
     return edges;
 }
+
+std::shared_ptr<CarcassModelStructure> MatrixCarcassModelStructure::clone() const
+{
+    return std::make_shared<MatrixCarcassModelStructure>(*this);
+}

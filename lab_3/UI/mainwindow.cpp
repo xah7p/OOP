@@ -11,19 +11,14 @@
 #include "EntityScaleCommand.h"
 #include "EntityRotateCommand.h"
 #include "EntityRestoreStateCommand.h"
-#include "SceneManager.h"
-#include "CarcassModelEntity.h"
-#include "CameraEntity.h"
-#include "Composite.h"
-#include "ManagerPool.h"
-#include "DrawManager.h"
-#include "QtPainter.h"
+#include "EntityDeleteCommand.h"
+#include "EntityComposeCommand.h"
+#include "QtGraphicsScene.h"
 
 #include <QComboBox>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QFrame>
-#include <QGraphicsScene>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
@@ -37,69 +32,14 @@
 #include <QDateTime>
 #include <algorithm>
 #include <cmath>
-#include <optional>
 
-namespace
-{
-QLineEdit *makeEdit(QWidget *parent, const QString &placeholder)
+QLineEdit *MainWindow::makeEdit(QWidget *parent, const QString &placeholder) const
 {
     auto *edit = new QLineEdit(parent);
     edit->setAlignment(Qt::AlignCenter);
     edit->setPlaceholderText(placeholder);
     return edit;
 }
-
-QString centerToString(const Vertex &center)
-{
-    return "(" + QString::number(center.getX(), 'f', 2) + "; "
-        + QString::number(center.getY(), 'f', 2) + "; "
-        + QString::number(center.getZ(), 'f', 2) + ")";
-}
-
-std::optional<Vertex> entityCenter(const std::shared_ptr<BaseEntity> &entity)
-{
-    if (!entity)
-        return std::nullopt;
-
-    if (const auto model = std::dynamic_pointer_cast<CarcassModelEntity>(entity))
-    {
-        auto structure = model->getStructure();
-        if (structure)
-            return structure->getCenter();
-    }
-
-    if (const auto camera = std::dynamic_pointer_cast<CameraEntity>(entity))
-    {
-        auto structure = camera->getStructure();
-        if (structure)
-            return structure->getViewpoint();
-    }
-
-    if (const auto composite = std::dynamic_pointer_cast<Composite>(entity))
-    {
-        Vertex sum(0.0, 0.0, 0.0);
-        size_t count = 0;
-        for (auto it = composite->cbegin(); it != composite->cend(); ++it)
-        {
-            auto childCenter = entityCenter(it->second);
-            if (!childCenter)
-                continue;
-            sum += *childCenter;
-            ++count;
-        }
-
-        if (count == 0)
-            return std::nullopt;
-
-        sum.setX(sum.getX() / static_cast<double>(count));
-        sum.setY(sum.getY() / static_cast<double>(count));
-        sum.setZ(sum.getZ() / static_cast<double>(count));
-        return sum;
-    }
-
-    return std::nullopt;
-}
-}  
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent)
@@ -122,7 +62,6 @@ MainWindow::MainWindow(QWidget *parent):
     Facade::instance()->execute(std::make_shared<CameraSetActiveCommand>(objects));
     activeCamId = objects;
     insertRow(objects++, "Камера 1", "Камера");
-    updateRowCenter(0);
     logOperation("Создана камера 1 и установлена активной");
 }
 
@@ -202,8 +141,8 @@ void MainWindow::createUi()
 
     tableWidget = new QTableWidget(central);
     tableWidget->setGeometry(880, 210, 410, 330);
-    tableWidget->setColumnCount(4);
-    tableWidget->setHorizontalHeaderLabels({"ID", "Имя", "Центр", "Тип"});
+    tableWidget->setColumnCount(3);
+    tableWidget->setHorizontalHeaderLabels({"ID", "Имя", "Тип"});
     tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->verticalHeader()->setVisible(false);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -214,17 +153,18 @@ void MainWindow::createUi()
 
 void MainWindow::createScene()
 {
-    scene = std::shared_ptr<QGraphicsScene>(
-        new QGraphicsScene(0, 0, planeWidget->width(), planeWidget->height(), this),
-        [](QGraphicsScene *) {});
-    scene->setSceneRect(0, 0, planeWidget->width(), planeWidget->height());
-    scene->setBackgroundBrush(QColor::fromRgb(39, 40, 41));
-    planeWidget->setScene(scene.get());
+    auto scene = Facade::instance()->createGraphicsScene(
+        static_cast<size_t>(planeWidget->width()),
+        static_cast<size_t>(planeWidget->height()));
+    if (!scene)
+        return;
+    scene->setBackgroundColor(39, 40, 41);
 
-    auto drawManager = std::dynamic_pointer_cast<DrawManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Draw));
-    if (drawManager)
-        drawManager->setPainter(std::make_shared<QtPainter>(scene));
+    auto qtScene = std::static_pointer_cast<QtGraphicsScene>(scene);
+    if (!qtScene)
+        return;
+    planeWidget->setScene(qtScene->getRawScene());
+    (void)Facade::instance()->createPainter(scene);
 }
 
 void MainWindow::insertRow(EntityId id, const QString &name, const QString &type)
@@ -233,8 +173,7 @@ void MainWindow::insertRow(EntityId id, const QString &name, const QString &type
     tableWidget->insertRow(row);
     tableWidget->setItem(row, 0, new QTableWidgetItem(QString::number(id)));
     tableWidget->setItem(row, 1, new QTableWidgetItem(name));
-    tableWidget->setItem(row, 2, new QTableWidgetItem("(0; 0; 0)"));
-    tableWidget->setItem(row, 3, new QTableWidgetItem(type));
+    tableWidget->setItem(row, 2, new QTableWidgetItem(type));
 }
 
 std::vector<int> MainWindow::selectedRows() const
@@ -248,28 +187,6 @@ std::vector<int> MainWindow::selectedRows() const
     std::sort(rows.begin(), rows.end());
     rows.erase(std::unique(rows.begin(), rows.end()), rows.end());
     return rows;
-}
-
-void MainWindow::updateRowCenter(int row)
-{
-    if (row < 0 || row >= tableWidget->rowCount())
-        return;
-
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Scene));
-    if (!sceneManager)
-        return;
-
-    const auto id = static_cast<EntityId>(tableWidget->item(row, 0)->text().toULongLong());
-    auto center = entityCenter(sceneManager->getEntity(id));
-    if (center)
-        tableWidget->setItem(row, 2, new QTableWidgetItem(centerToString(*center)));
-}
-
-void MainWindow::updateCentersForRows(const std::vector<int> &rows)
-{
-    for (const int row : rows)
-        updateRowCenter(row);
 }
 
 void MainWindow::onLoadModelBtnClicked()
@@ -289,7 +206,6 @@ void MainWindow::onLoadModelBtnClicked()
         Facade::instance()->execute(std::make_shared<LoadCommand>(id, req));
         Facade::instance()->execute(std::make_shared<DrawCommand>());
         insertRow(objects++, QFileInfo(path).fileName(), "Каркас");
-        updateRowCenter(tableWidget->rowCount() - 1);
         logOperation("Загрузка модели: " + QFileInfo(path).fileName());
     }
     catch (const std::exception &ex)
@@ -317,7 +233,6 @@ void MainWindow::onShiftBtnClicked()
         Facade::instance()->execute(std::make_shared<EntityMoveCommand>(id, args));
     }
     Facade::instance()->execute(std::make_shared<DrawCommand>());
-    updateCentersForRows(rows);
     logOperation("Перенос выбранных объектов");
 }
 
@@ -332,22 +247,13 @@ void MainWindow::onScaleBtnClicked()
         return;
     }
     const auto rows = selectedRows();
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Scene));
-    if (!sceneManager)
-        return;
-
     for (const int row : rows)
     {
         const auto id = static_cast<EntityId>(tableWidget->item(row, 0)->text().toULongLong());
-        auto center = entityCenter(sceneManager->getEntity(id));
-        if (!center)
-            continue;
-        ScaleArgs args(k, center->getX(), center->getY(), center->getZ());
+        ScaleArgs args(k, 0.0, 0.0, 0.0);
         Facade::instance()->execute(std::make_shared<EntityScaleCommand>(id, args));
     }
     Facade::instance()->execute(std::make_shared<DrawCommand>());
-    updateCentersForRows(rows);
     logOperation("Масштабирование выбранных объектов");
 }
 
@@ -363,23 +269,14 @@ void MainWindow::onRotateBtnClicked()
         return;
     }
     const auto rows = selectedRows();
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Scene));
-    if (!sceneManager)
-        return;
-
     for (const int row : rows)
     {
         const auto id = static_cast<EntityId>(tableWidget->item(row, 0)->text().toULongLong());
-        auto center = entityCenter(sceneManager->getEntity(id));
-        if (!center)
-            continue;
         RotateArgs args(ax * M_PI / 180.0, ay * M_PI / 180.0, az * M_PI / 180.0,
-            center->getX(), center->getY(), center->getZ());
+            0.0, 0.0, 0.0);
         Facade::instance()->execute(std::make_shared<EntityRotateCommand>(id, args));
     }
     Facade::instance()->execute(std::make_shared<DrawCommand>());
-    updateCentersForRows(rows);
     logOperation("Поворот выбранных объектов");
 }
 
@@ -387,7 +284,6 @@ void MainWindow::addCameraBtnClicked()
 {
     Facade::instance()->execute(std::make_shared<CameraAddCommand>(objects));
     insertRow(objects++, "Камера", "Камера");
-    updateRowCenter(tableWidget->rowCount() - 1);
     logOperation("Создана новая камера");
 }
 
@@ -403,7 +299,6 @@ void MainWindow::onUndoBtnClicked()
         Facade::instance()->execute(std::make_shared<EntityRestoreStateCommand>(id));
     }
     Facade::instance()->execute(std::make_shared<DrawCommand>());
-    updateCentersForRows(rows);
     logOperation("Undo выбранных объектов");
 }
 
@@ -433,7 +328,7 @@ void MainWindow::contextMenuRequested(const QPoint &pos)
     }
     else if (rows.size() == 1)
     {
-        const auto type = tableWidget->item(rows.front(), 3)->text();
+        const auto type = tableWidget->item(rows.front(), 2)->text();
         if (type == "Камера")
         {
             auto *setActiveAction = menu.addAction("Установить активной");
@@ -450,18 +345,13 @@ void MainWindow::deleteObjectRequested()
     for (int row : rows)
     {
         const auto id = tableWidget->item(row, 0)->text().toULongLong();
-        const auto type = tableWidget->item(row, 3)->text();
+        const auto type = tableWidget->item(row, 2)->text();
         if (type == "Камера" && id == activeCamId)
             continue;
         if (type == "Камера")
             Facade::instance()->execute(std::make_shared<CameraDeleteCommand>(id));
         else
-        {
-            auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
-                ManagerPool::instance()->getManager(ManagerIds::Scene));
-            if (sceneManager)
-                (void)sceneManager->removeEntity(id);
-        }
+            Facade::instance()->execute(std::make_shared<EntityDeleteCommand>(id));
         tableWidget->removeRow(row);
     }
     Facade::instance()->execute(std::make_shared<DrawCommand>());
@@ -476,7 +366,7 @@ void MainWindow::setActiveCamRequested()
         QMessageBox::information(this, "Камера", "Выберите ровно одну камеру.");
         return;
     }
-    const auto type = tableWidget->item(rows.front(), 3)->text();
+    const auto type = tableWidget->item(rows.front(), 2)->text();
     if (type != "Камера")
     {
         QMessageBox::information(this, "Камера", "Активной можно сделать только камеру.");
@@ -498,38 +388,25 @@ void MainWindow::composeRequested()
         return;
     }
 
-    auto sceneManager = std::dynamic_pointer_cast<SceneManager>(
-        ManagerPool::instance()->getManager(ManagerIds::Scene));
-    if (!sceneManager)
-        return;
-
-    auto composite = std::make_shared<Composite>();
-    size_t added = 0;
+    std::vector<EntityId> ids;
     for (const int row : rows)
     {
-        const auto type = tableWidget->item(row, 3)->text();
+        const auto type = tableWidget->item(row, 2)->text();
         if (type == "Камера")
             continue;
-
-        const auto id = static_cast<EntityId>(tableWidget->item(row, 0)->text().toULongLong());
-        auto entity = sceneManager->getEntity(id);
-        if (entity)
-        {
-            composite->add({entity});
-            ++added;
-        }
+        ids.push_back(static_cast<EntityId>(tableWidget->item(row, 0)->text().toULongLong()));
     }
 
-    if (added < 2)
+    bool created = false;
+    Facade::instance()->execute(std::make_shared<EntityComposeCommand>(ids, created));
+    if (!created)
     {
         QMessageBox::information(this, "Композит",
             "Для композита нужно минимум два некамерных объекта.");
         return;
     }
 
-    (void)sceneManager->addEntity(composite);
     insertRow(objects++, "Композит", "Композит");
-    updateRowCenter(tableWidget->rowCount() - 1);
     Facade::instance()->execute(std::make_shared<DrawCommand>());
     logOperation("Создан композит из выбранных объектов");
 }

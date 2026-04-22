@@ -16,7 +16,7 @@ private:
     std::shared_ptr<BuilderSolution> builderSolution;
     std::shared_ptr<LoadDirectorSolution> directorSolution;
 
-    std::map<EntityKind, std::unique_ptr<LoadStrategy>> strategies;
+    // std::map<EntityKind, std::unique_ptr<LoadStrategy>> strategies;
 public:
     LoadManager();
     virtual ~LoadManager() override = default;

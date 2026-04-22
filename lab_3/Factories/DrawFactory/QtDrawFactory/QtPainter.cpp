@@ -1,8 +1,6 @@
 #include "QtPainter.h"
 
-#include <QPen>
-
-QtPainter::QtPainter(std::shared_ptr<QGraphicsScene> scene):
+QtPainter::QtPainter(std::shared_ptr<BaseGraphicsScene> scene):
     graphicsScene(std::move(scene))
 { }
 
@@ -10,8 +8,7 @@ void QtPainter::drawLine(const Vertex &vertex1, const Vertex &vertex2)
 {
     if (!graphicsScene)
         return;
-    graphicsScene->addLine(vertex1.getX(), vertex1.getY(), vertex2.getX(), vertex2.getY(),
-                           QPen(QColor::fromRgb(216, 217, 218)));
+    graphicsScene->addLine(vertex1.getX(), vertex1.getY(), vertex2.getX(), vertex2.getY());
 }
 
 void QtPainter::clear()
@@ -23,21 +20,21 @@ void QtPainter::clear()
 void QtPainter::setWidht(size_t width) const noexcept
 {
     if (graphicsScene)
-        graphicsScene->setSceneRect(0.0, 0.0, static_cast<qreal>(width), graphicsScene->height());
+        graphicsScene->setSceneRect(0.0, 0.0, static_cast<double>(width), graphicsScene->height());
 }
 
 void QtPainter::setHeight(size_t height) const noexcept
 {
     if (graphicsScene)
-        graphicsScene->setSceneRect(0.0, 0.0, graphicsScene->width(), static_cast<qreal>(height));
+        graphicsScene->setSceneRect(0.0, 0.0, graphicsScene->width(), static_cast<double>(height));
 }
 
 size_t QtPainter::getWidht() const noexcept
 {
-    return graphicsScene ? static_cast<size_t>(graphicsScene->width()) : 0;
+    return graphicsScene ? static_cast<size_t>(graphicsScene->width()) : 0U;
 }
 
 size_t QtPainter::getHeight() const noexcept
 {
-    return graphicsScene ? static_cast<size_t>(graphicsScene->height()) : 0;
+    return graphicsScene ? static_cast<size_t>(graphicsScene->height()) : 0U;
 }

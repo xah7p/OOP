@@ -7,7 +7,10 @@
 class CameraDirector: public BaseDirector {
 public:
     CameraDirector() = delete;
-    explicit CameraDirector(std::shared_ptr<BaseBuilder> builder);
+    CameraDirector(
+        const std::shared_ptr<BaseReader>& reader,
+        EntityStructureKind structureKind,
+        std::shared_ptr<BuilderSolution> builderSolution);
 
     ~CameraDirector() override = default;
 

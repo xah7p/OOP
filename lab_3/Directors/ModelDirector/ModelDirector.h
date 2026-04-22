@@ -4,7 +4,9 @@
 
 class ModelDirector: public BaseDirector {
 public:
-    ModelDirector() = default;
+    explicit ModelDirector(std::shared_ptr<BuilderSolution> builderSolution):
+        BaseDirector(std::move(builderSolution))
+    { }
     ~ModelDirector() override = default;
 
     virtual std::shared_ptr<BaseEntity> create() const = 0;

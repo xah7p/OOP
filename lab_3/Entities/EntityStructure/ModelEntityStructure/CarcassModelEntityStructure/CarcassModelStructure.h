@@ -22,4 +22,5 @@ public:
     virtual Vertex getCenter() noexcept { return center; }
     virtual std::vector<Vertex> getVertices() const noexcept = 0;
     virtual std::vector<Edge> getEdges() const noexcept = 0;
+    virtual std::shared_ptr<CarcassModelStructure> clone() const = 0;
 };

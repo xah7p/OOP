@@ -3,7 +3,6 @@
 #include "BaseEntity.h"
 #include "LoadRequest.h"
 #include "ReaderSolution.h"
-#include "BuilderSolution.h"
 #include "LoadDirectorSolution.h"
 
 class LoadStrategy {
@@ -12,7 +11,6 @@ public:
     virtual std::shared_ptr<BaseEntity> load(
         const LoadRequest& req,
         std::shared_ptr<ReaderSolution> readerSolution,
-        std::shared_ptr<BuilderSolution> builderSolution,
         const std::shared_ptr<LoadDirectorSolution>& directorSolution) = 0;
 };
 
@@ -22,7 +20,6 @@ public:
     virtual std::shared_ptr<BaseEntity> load(
         const LoadRequest& req,
         std::shared_ptr<ReaderSolution> readerSolution,
-        std::shared_ptr<BuilderSolution> builderSolution,
         const std::shared_ptr<LoadDirectorSolution>& directorSolution) override;
 };
 
@@ -32,6 +29,5 @@ public:
     virtual std::shared_ptr<BaseEntity> load(
         const LoadRequest& req,
         std::shared_ptr<ReaderSolution> readerSolution,
-        std::shared_ptr<BuilderSolution> builderSolution,
         const std::shared_ptr<LoadDirectorSolution>& directorSolution) override;
 };

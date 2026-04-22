@@ -20,4 +20,5 @@ public:
     virtual void transform(std::shared_ptr<TransformData>) = 0;
     virtual void accept(std::shared_ptr<BaseVisitor> visitor) = 0;
     virtual Vertex getViewpoint() const noexcept = 0;
+    virtual std::shared_ptr<CameraEntityStructure> clone() const = 0;
 };

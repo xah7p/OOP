@@ -15,8 +15,8 @@ public:
 
     virtual ~TransformVisitor() = 0;
 
-    virtual void visit(std::shared_ptr<CarcassModelStructure>) const override;
-    virtual void visit(std::shared_ptr<CameraEntityStructure>) const override;
+    virtual void visit(std::shared_ptr<CarcassModelStructure>) override;
+    virtual void visit(std::shared_ptr<CameraEntityStructure>) override;
 protected:
     std::shared_ptr<TransformData> action;
 };

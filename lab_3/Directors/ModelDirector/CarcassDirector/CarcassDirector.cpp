@@ -2,14 +2,18 @@
 
 #include "BaseModelBuilder.h"
 
-CarcassDirector::CarcassDirector(std::shared_ptr<BaseBuilder> builder)
+CarcassDirector::CarcassDirector(
+    const std::shared_ptr<BaseReader>& reader,
+    EntityStructureKind structureKind,
+    std::shared_ptr<BuilderSolution> builderSolution):
+    ModelDirector(std::move(builderSolution))
 {
-    this->builder = std::move(builder);
+    builder = createBuilder(reader, EntityKind::Model, structureKind);
 }
 
 std::shared_ptr<BaseEntity> CarcassDirector::create() const
 {
-    auto modelBuilder = std::dynamic_pointer_cast<BaseModelBuilder>(builder);
+    auto modelBuilder = std::static_pointer_cast<BaseModelBuilder>(builder);
     if (!modelBuilder)
         return nullptr;
 

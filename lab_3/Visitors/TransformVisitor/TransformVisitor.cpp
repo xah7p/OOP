@@ -6,13 +6,13 @@ TransformVisitor::TransformVisitor(std::shared_ptr<TransformData> action):
 
 TransformVisitor::~TransformVisitor() = default;
 
-void TransformVisitor::visit(std::shared_ptr<CarcassModelStructure> structure) const
+void TransformVisitor::visit(std::shared_ptr<CarcassModelStructure> structure)
 {
     if (structure)
         structure->transform(action);
 }
 
-void TransformVisitor::visit(std::shared_ptr<CameraEntityStructure> structure) const
+void TransformVisitor::visit(std::shared_ptr<CameraEntityStructure> structure)
 {
     if (structure)
         structure->transform(action);

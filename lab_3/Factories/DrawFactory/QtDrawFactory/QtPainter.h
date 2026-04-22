@@ -1,17 +1,17 @@
 #pragma once
 
 #include <cstddef>
-#include <QGraphicsScene>
 #include "Vertex.h"
 #include "BasePainter.h"
+#include "BaseGraphicsScene.h"
 
 class QtPainter: public BasePainter {
 private:
-    std::shared_ptr<QGraphicsScene> graphicsScene;
+    std::shared_ptr<BaseGraphicsScene> graphicsScene;
 
 public:
     QtPainter() = delete;
-    QtPainter(std::shared_ptr<QGraphicsScene> scene);
+    QtPainter(std::shared_ptr<BaseGraphicsScene> scene);
 
     virtual ~QtPainter() override = default;
 
