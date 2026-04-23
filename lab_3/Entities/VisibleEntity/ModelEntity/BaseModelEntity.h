@@ -6,5 +6,4 @@
 class BaseModelEntity : public VisibleEntity {
 public:
     virtual ~BaseModelEntity() override = default;
-    virtual std::shared_ptr<CarcassModelStructure> accept() const = 0;
 };

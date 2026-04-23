@@ -19,7 +19,6 @@ public:
     virtual ~CarcassModelEntity() override = default;
 
     virtual void accept(std::shared_ptr<BaseVisitor>) override;
-    virtual std::shared_ptr<CarcassModelStructure> accept() const override;
     virtual void assignStateFrom(const BaseEntity& other) override;
     virtual std::optional<Vertex> getCenter() const override;
 
