@@ -16,11 +16,6 @@ void CameraEntity::accept(std::shared_ptr<BaseVisitor> visitor)
         visitor->visit(structure);
 }
 
-std::shared_ptr<CameraEntityStructure> CameraEntity::accept() const
-{
-    return structure;
-}
-
 std::optional<Vertex> CameraEntity::getCenter() const
 {
     return structure ? std::optional<Vertex>(structure->getViewpoint()) : std::nullopt;

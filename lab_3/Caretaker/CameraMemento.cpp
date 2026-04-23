@@ -6,9 +6,9 @@
 CameraMemento::CameraMemento(const CameraEntity& value):
     entity(nullptr)
 {
-    auto structure = value.accept();
-    if (structure)
-        set(std::make_unique<CameraEntity>(structure->clone()));
+    auto cloned = value.clone();
+    if (cloned)
+        set(std::unique_ptr<BaseEntity>(cloned.get()));
 }
 
 CameraMemento::~CameraMemento() = default;

@@ -16,11 +16,6 @@ void CarcassModelEntity::accept(std::shared_ptr<BaseVisitor> visitor)
         visitor->visit(structure);
 }
 
-std::shared_ptr<CarcassModelStructure> CarcassModelEntity::accept() const
-{
-    return structure;
-}
-
 std::optional<Vertex> CarcassModelEntity::getCenter() const
 {
     return structure ? std::optional<Vertex>(structure->getCenter()) : std::nullopt;

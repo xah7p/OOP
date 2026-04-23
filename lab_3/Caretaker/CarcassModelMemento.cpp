@@ -6,9 +6,9 @@
 CarcassModelMemento::CarcassModelMemento(const CarcassModelEntity& value):
     entity(nullptr)
 {
-    auto structure = value.accept();
-    if (structure)
-        set(std::make_unique<CarcassModelEntity>(structure->clone()));
+    auto cloned = value.clone();
+    if (cloned)
+        set(std::unique_ptr<BaseEntity>(cloned.get()));
 }
 
 CarcassModelMemento::~CarcassModelMemento() = default;
