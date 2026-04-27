@@ -28,45 +28,41 @@ void Controller::handleMovementSlot() {
     if (taskManager_.isEmpty()) {
         qInfo("Нет целей");
         emit noTargetsSignal();
-    } else if (previousStatus == ControllerStatus::PROCESSING_TARGET) {
+        return;
+    }
+
+    if (previousStatus == ControllerStatus::PROCESSING_TARGET)
         currentFloor_ += currentDirection_;
-        if (currentFloor_ == taskManager_.frontFloor())
-            emit reachedTargetSignal(currentFloor_);
-        else
-            emit toMoveCabinSignal(currentFloor_, currentDirection_);
-    } else {
-        int targetFloor = taskManager_.frontFloor();
-        if (targetFloor == currentFloor_) {
-            emit reachedTargetSignal(currentFloor_);
-        } else {
+
+    int targetFloor = taskManager_.frontFloor();
+    if (currentFloor_ == targetFloor)
+        emit reachedTargetSignal(currentFloor_);
+    else {
+        if (previousStatus != ControllerStatus::PROCESSING_TARGET)
             currentDirection_ = getDirection(targetFloor);
-            emit toMoveCabinSignal(currentFloor_, currentDirection_);
-        }
+        emit toMoveCabinSignal(currentFloor_, currentDirection_);
     }
 }
 
 void Controller::newTargetSlot(int floor) {
-    auto previousStatus = status_;
     qInfo("Вызов лифта на этаж №%d", floor);
+    auto previousStatus = status_;
+    if (previousStatus != ControllerStatus::PROCESSING_TARGET)
+        status_ = ControllerStatus::NEW_TARGET;
 
     if (previousStatus != ControllerStatus::PROCESSING_TARGET && currentFloor_ == floor) {
         if (taskManager_.hasTaskForFloor(floor))
             return;
-        status_ = ControllerStatus::NEW_TARGET;
         taskManager_.addTask(Task(floor));
-        emit reachedTargetSignal(currentFloor_);
+        emit nextTargetSignal();
         return;
     }
 
     if (!taskManager_.hasTaskForFloor(floor))
         taskManager_.insertTaskByDirection(floor, currentFloor_, currentDirection_);
 
-    if (previousStatus == ControllerStatus::FREE) {
-        status_ = ControllerStatus::NEW_TARGET;
+    if (previousStatus == ControllerStatus::FREE)
         emit nextTargetSignal();
-    } else {
-        status_ = previousStatus;
-    }
 }
 
 void Controller::targetReachedSlot(int floor) {
