@@ -6,13 +6,9 @@ Cabin::Cabin(QObject* parent)
     , lastMoveFromFloor_(START_FLOOR)
     , lastMoveDirection_(Direction::UP) {
     moveTimer_.setSingleShot(true);
-    QObject::connect(&moveTimer_, &QTimer::timeout, this, &Cabin::onMoveTimeoutSlot);
+    QObject::connect(&moveTimer_, &QTimer::timeout, this, &Cabin::cabinReachedSlot);
     QObject::connect(this, &Cabin::cabinOpenDoorsSignal, &doors_, &Doors::startOpeningSlot);
     QObject::connect(&doors_, &Doors::doorIsClosedSignal, this, &Cabin::cabinUnlockSlot);
-}
-
-void Cabin::onMoveTimeoutSlot() {
-    emit movementTickSignal(lastMoveFromFloor_, lastMoveDirection_);
 }
 
 void Cabin::cabinMoveSlot(int floor, Direction direction) {
@@ -26,13 +22,15 @@ void Cabin::cabinMoveSlot(int floor, Direction direction) {
     moveTimer_.start(MOVE_TIME);
 }
 
-void Cabin::cabinStopSlot(int floor) {
-    if (status_ == CabinStatus::MOVING) {
-        status_ = CabinStatus::STOPPED;
-        qInfo(TEXT_BLUE "Лифт остановился на этаже №%d" TEXT_DEFAULT, floor);
-    }
+void Cabin::cabinReachedSlot() {
+    if (status_ != CabinStatus::MOVING)
+        return;
 
-    emit cabinStoppedSignal();
+    lastMoveFromFloor_ += lastMoveDirection_;
+    status_ = CabinStatus::REACHED;
+    qInfo(TEXT_BLUE "Лифт достиг этаж №%d" TEXT_DEFAULT, lastMoveFromFloor_);
+
+    emit movementTickSignal(lastMoveFromFloor_, lastMoveDirection_);
 }
 
 void Cabin::cabinLockSlot() {

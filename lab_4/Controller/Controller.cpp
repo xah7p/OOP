@@ -7,10 +7,8 @@ Controller::Controller(QObject *parent)
     , currentDirection_(Direction::UP) {
     QObject::connect(&cabin_, &Cabin::movementTickSignal, this, &Controller::handleMovementSlot);
     QObject::connect(&cabin_, &Cabin::cabinUnlockedSignal, this, &Controller::handleMovementSlot);
-    QObject::connect(&cabin_, &Cabin::cabinStoppedSignal, this, &Controller::cabinStoppedSlot);
 
     QObject::connect(this, &Controller::toMoveCabinSignal, &cabin_, &Cabin::cabinMoveSlot);
-    QObject::connect(this, &Controller::toStopCabinSignal, &cabin_, &Cabin::cabinStopSlot);
     QObject::connect(this, &Controller::toLockCabinSignal, &cabin_, &Cabin::cabinLockSlot);
 
     QObject::connect(this, &Controller::reachedTargetSignal, this, &Controller::targetReachedSlot);
@@ -71,12 +69,6 @@ void Controller::targetReachedSlot(int floor) {
     status_ = ControllerStatus::REACHED_TARGET;
 
     taskManager_.removeTask();
-    emit toStopCabinSignal(currentFloor_);
-}
-
-void Controller::cabinStoppedSlot() {
-    if (status_ != ControllerStatus::REACHED_TARGET)
-        return;
     emit toLockCabinSignal();
 }
 

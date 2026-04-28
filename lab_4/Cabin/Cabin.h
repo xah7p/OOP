@@ -4,10 +4,8 @@
 #include "../Defines.h"
 #include "../Doors/Doors.h"
 
-class Controller;
-
 enum class CabinStatus {
-    STOPPED,
+    REACHED,
     MOVING,
     LOCKED,
     UNLOCKED
@@ -28,16 +26,12 @@ public:
 
 signals:
     void movementTickSignal(int fromFloor, Direction direction);
-    void cabinStoppedSignal();
     void cabinOpenDoorsSignal();
     void cabinUnlockedSignal();
 
-private slots:
-    void onMoveTimeoutSlot();
-
 public slots:
     void cabinMoveSlot(int floor, Direction direction);
-    void cabinStopSlot(int floor);
+    void cabinReachedSlot();
     void cabinLockSlot();
     void cabinUnlockSlot();
 };

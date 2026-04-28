@@ -29,7 +29,6 @@ public:
 
 signals:
     void toMoveCabinSignal(int floor, Direction direction);
-    void toStopCabinSignal(int floor);
     void toLockCabinSignal();
 
     void reachedTargetSignal(int floor);
@@ -42,6 +41,5 @@ public slots:
 private slots:
     void handleMovementSlot();
     void targetReachedSlot(int floor);
-    void cabinStoppedSlot();
     void freeSlot();
 };
