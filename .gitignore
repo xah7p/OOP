@@ -39,3 +39,8 @@
 
 # debug information files
 *.dwo
+
+# CMake/Qt build artifacts
+**/build/
+**/cmake-build-*/
+**/.qtc_clangd/
